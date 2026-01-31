@@ -2,6 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import './Page.css';
 
 function AssessmentPage() {
+  // Behavior detection thresholds
+  const INACTIVITY_THRESHOLD_SECONDS = 30;
+  const FAST_SUBMISSION_TIME_THRESHOLD = 10;
+  const MIN_ANSWER_LENGTH = 50;
+  const SUBSTANTIAL_ANSWER_LENGTH = 100;
+  const SMALL_CHANGE_THRESHOLD = 3;
+  const FREQUENT_TYPING_WINDOW_MS = 5000;
+  const LARGE_PASTE_THRESHOLD = 50;
+  const PASTE_DETECTION_DELAY_MS = 500;
+
   // Mock data structure for subjects and concepts
   const subjects = {
     'Coding': {
@@ -137,9 +147,9 @@ function AssessmentPage() {
     // Detect incremental typing (small changes, frequent updates)
     if (typingEvents.current.length > 1) {
       const recentEvents = typingEvents.current.slice(-5);
-      const hasSmallChanges = recentEvents.every(event => event.changeSize <= 3);
+      const hasSmallChanges = recentEvents.every(event => event.changeSize <= SMALL_CHANGE_THRESHOLD);
       const hasFrequentUpdates = recentEvents.length >= 3 && 
-        (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < 5000;
+        (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < FREQUENT_TYPING_WINDOW_MS;
       
       if (hasSmallChanges && hasFrequentUpdates) {
         hasTypedIncrementally.current = true;
@@ -148,7 +158,7 @@ function AssessmentPage() {
     
     // Detect large paste (sudden large text addition)
     const changeSize = Math.abs(newText.length - answerText.length);
-    if (changeSize > 50 && timeSinceLastActivity > 500) {
+    if (changeSize > LARGE_PASTE_THRESHOLD && timeSinceLastActivity > PASTE_DETECTION_DELAY_MS) {
       // This looks like a paste rather than typing
       hasTypedIncrementally.current = false;
     }
@@ -168,7 +178,7 @@ function AssessmentPage() {
       const firstTypingTime = typingEvents.current[0].timestamp;
       const inactivityBeforeTyping = (firstTypingTime - questionLoadTime.current) / 1000;
       
-      if (inactivityBeforeTyping > 30) {
+      if (inactivityBeforeTyping > INACTIVITY_THRESHOLD_SECONDS) {
         flags.push({
           type: 'inactivity',
           message: 'Possible lack of clarity',
@@ -178,16 +188,16 @@ function AssessmentPage() {
     }
     
     // Pattern 2: Very fast full answer submission
-    if (timeSinceQuestionLoad < 10 && answerText.length > 50) {
+    if (timeSinceQuestionLoad < FAST_SUBMISSION_TIME_THRESHOLD && answerText.length > MIN_ANSWER_LENGTH) {
       flags.push({
         type: 'fast-submission',
-        message: 'Answer confidence low',
+        message: 'Quick submission detected',
         details: 'You submitted quickly! Take your time to review your answer and ensure you\'ve covered all aspects of the question.'
       });
     }
     
     // Pattern 3: No incremental typing (possible paste)
-    if (!hasTypedIncrementally.current && answerText.length > 100) {
+    if (!hasTypedIncrementally.current && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
       flags.push({
         type: 'no-incremental',
         message: 'Review fundamentals recommended',
