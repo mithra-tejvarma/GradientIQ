@@ -1,6 +1,9 @@
 import './ProgressBar.css';
 
 function ProgressBar({ percentage, label, topic }) {
+  // Clamp percentage between 0 and 100 for safety
+  const clampedPercentage = Math.min(100, Math.max(0, percentage || 0));
+  
   return (
     <div className="progress-bar-container">
       {(label || topic) && (
@@ -12,9 +15,9 @@ function ProgressBar({ percentage, label, topic }) {
       <div className="progress-bar-track">
         <div 
           className="progress-bar-fill" 
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${clampedPercentage}%` }}
         >
-          <span className="progress-bar-text">{percentage}%</span>
+          <span className="progress-bar-text">{clampedPercentage}%</span>
         </div>
       </div>
     </div>
