@@ -1,0 +1,51 @@
+.topic-card {
+  background-color: rgba(100, 108, 255, 0.05);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.topic-card-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.topic-card-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.topic-card-percentage {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #646cff;
+}
+
+.topic-card-stars {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+@media (prefers-color-scheme: light) {
+  .topic-card {
+    background-color: rgba(83, 91, 242, 0.05);
+    border: 1px solid rgba(83, 91, 242, 0.2);
+  }
+
+  .topic-card-name {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .topic-card-percentage {
+    color: #535bf2;
+  }
+}
