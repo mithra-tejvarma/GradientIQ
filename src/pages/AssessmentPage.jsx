@@ -1,6 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Page.css';
 import { generateNLPSignals } from '../utils/nlpAnalysis';
+
+// Behavior detection thresholds
+const INACTIVITY_THRESHOLD_SECONDS = 30;
+const FAST_SUBMISSION_TIME_THRESHOLD_SECONDS = 10;
+const SUBSTANTIAL_ANSWER_LENGTH = 100;
+const SMALL_CHANGE_THRESHOLD = 3;
+const FREQUENT_TYPING_WINDOW_MS = 5000;
+const LARGE_PASTE_THRESHOLD = 50;
+const PASTE_DETECTION_DELAY_MS = 500;
+const MAX_TYPING_EVENTS = 100; // Limit array size to prevent memory issues
 
 function AssessmentPage() {
   // Mock data structure for subjects and concepts
@@ -100,6 +110,100 @@ function AssessmentPage() {
     questionText: 'Question not available.'
   };
 
+  // Reset behavior tracking when question changes
+  useEffect(() => {
+    questionLoadTime.current = Date.now();
+    typingEvents.current = [];
+    lastActivityTime.current = Date.now();
+    hasTypedIncrementally.current = false;
+    hasPastedContent.current = false;
+  }, [selectedConcept]);
+
+  // Handle typing in the answer textarea
+  const handleAnswerChange = (e) => {
+    const newText = e.target.value;
+    const currentTime = Date.now();
+    const timeSinceLastActivity = currentTime - lastActivityTime.current;
+    
+    // Track typing event with size limit to prevent memory issues
+    typingEvents.current.push({
+      timestamp: currentTime,
+      textLength: newText.length,
+      changeSize: Math.abs(newText.length - answerText.length)
+    });
+    
+    // Keep only the most recent events
+    if (typingEvents.current.length > MAX_TYPING_EVENTS) {
+      typingEvents.current = typingEvents.current.slice(-MAX_TYPING_EVENTS);
+    }
+    
+    // Detect incremental typing (small changes, frequent updates)
+    if (typingEvents.current.length > 1) {
+      const recentEvents = typingEvents.current.slice(-5);
+      // Ensure we have enough events to analyze
+      if (recentEvents.length >= 3) {
+        const hasSmallChanges = recentEvents.every(event => event.changeSize <= SMALL_CHANGE_THRESHOLD);
+        const hasFrequentUpdates = 
+          (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < FREQUENT_TYPING_WINDOW_MS;
+        
+        if (hasSmallChanges && hasFrequentUpdates) {
+          hasTypedIncrementally.current = true;
+        }
+      }
+    }
+    
+    // Detect large paste (sudden large text addition)
+    const changeSize = Math.abs(newText.length - answerText.length);
+    if (changeSize > LARGE_PASTE_THRESHOLD && timeSinceLastActivity > PASTE_DETECTION_DELAY_MS) {
+      // This looks like a paste rather than typing
+      hasPastedContent.current = true;
+    }
+    
+    lastActivityTime.current = currentTime;
+    setAnswerText(newText);
+  };
+
+  // Analyze behavior patterns
+  const analyzeBehaviorPatterns = () => {
+    const flags = [];
+    const currentTime = Date.now();
+    const timeSinceQuestionLoad = (currentTime - questionLoadTime.current) / 1000; // in seconds
+    
+    // Pattern 1: Long inactivity pause after question load
+    if (typingEvents.current.length > 0) {
+      const firstTypingTime = typingEvents.current[0].timestamp;
+      const inactivityBeforeTyping = (firstTypingTime - questionLoadTime.current) / 1000;
+      
+      if (inactivityBeforeTyping > INACTIVITY_THRESHOLD_SECONDS) {
+        flags.push({
+          type: 'inactivity',
+          message: 'Possible lack of clarity',
+          details: 'We noticed a pause before starting. If the question was unclear, feel free to ask for clarification or review the concept materials.'
+        });
+      }
+    }
+    
+    // Pattern 2: Very fast full answer submission
+    if (timeSinceQuestionLoad < FAST_SUBMISSION_TIME_THRESHOLD_SECONDS && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
+      flags.push({
+        type: 'fast-submission',
+        message: 'Quick submission detected',
+        details: 'You submitted quickly! Take your time to review your answer and ensure you\'ve covered all aspects of the question.'
+      });
+    }
+    
+    // Pattern 3: No incremental typing (possible paste)
+    if (!hasTypedIncrementally.current && hasPastedContent.current && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
+      flags.push({
+        type: 'no-incremental',
+        message: 'Review fundamentals recommended',
+        details: 'Your answer appears complete. Consider reviewing the fundamental concepts to strengthen your understanding and build confidence.'
+      });
+    }
+    
+    return flags;
+  };
+
   // Placeholder handlers
   const handleSubmit = () => {
     console.log('Submit clicked - analyzing answer...');
@@ -118,13 +222,27 @@ function AssessmentPage() {
   };
 
   const handleSaveProgress = () => {
-    console.log('Save Progress clicked - logic to be implemented');
+    console.log('Progress saved:', {
+      subject: selectedSubject,
+      concept: selectedConcept,
+      answer,
+      conceptScores
+    });
+    alert('Progress saved successfully!');
+  };
+
+  const handleConceptChange = (concept) => {
+    setSelectedConcept(concept);
+    // Reset answer and behavior tracking when concept changes
+    setAnswerText('');
+    setBehaviorFlags([]);
   };
 
   const handleSubjectChange = (subject) => {
     setSelectedSubject(subject);
-    // Set first concept of the new subject as selected
-    const firstConcept = subjects[subject].concepts[0];
+    // Set first unlocked concept of the new subject as selected
+    const unlockedForSubject = unlockedConcepts[subject] || [];
+    const firstConcept = unlockedForSubject[0] || subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
     // Clear feedback and answer when changing subject
     setNlpFeedback(null);
@@ -161,15 +279,23 @@ function AssessmentPage() {
       <section className="assessment-section">
         <h2>Select Concept</h2>
         <div className="concept-selector">
-          {subjects[selectedSubject].concepts.map((concept) => (
-            <button
-              key={concept}
-              className={`concept-button ${selectedConcept === concept ? 'active' : ''}`}
-              onClick={() => handleConceptChange(concept)}
-            >
-              {concept}
-            </button>
-          ))}
+          {subjects[selectedSubject].concepts.map((concept) => {
+            const isUnlocked = (unlockedConcepts[selectedSubject] || []).includes(concept);
+            const score = conceptScores[concept];
+            return (
+              <button
+                key={concept}
+                className={`concept-button ${selectedConcept === concept ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`}
+                onClick={() => isUnlocked && handleConceptChange(concept)}
+                disabled={!isUnlocked}
+                title={!isUnlocked ? 'Complete previous concept to unlock' : ''}
+              >
+                {concept}
+                {!isUnlocked && ' 🔒'}
+                {score !== undefined && ` (${score}%)`}
+              </button>
+            );
+          })}
         </div>
       </section>
 
