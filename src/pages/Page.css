@@ -169,6 +169,223 @@
   border-color: rgba(100, 108, 255, 0.6);
 }
 
+/* NLP Feedback Styles */
+.feedback-section {
+  margin-top: 2rem;
+}
+
+.nlp-feedback-container {
+  background-color: rgba(100, 108, 255, 0.03);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+.feedback-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background-color: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.disclaimer-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.feedback-disclaimer p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+.feedback-signal-card {
+  background: linear-gradient(135deg, rgba(100, 108, 255, 0.15) 0%, rgba(100, 108, 255, 0.05) 100%);
+  border: 2px solid rgba(100, 108, 255, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.feedback-signal-card.signal-originality-likely {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.05) 100%);
+  border-color: rgba(76, 175, 80, 0.5);
+}
+
+.feedback-signal-card.signal-needs-review {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.05) 100%);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+.feedback-signal-card.signal-low-conceptual-depth {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(244, 67, 54, 0.05) 100%);
+  border-color: rgba(244, 67, 54, 0.5);
+}
+
+.signal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.signal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.confidence-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confidence-high {
+  background-color: rgba(76, 175, 80, 0.3);
+  color: rgba(139, 195, 74, 1);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.confidence-medium {
+  background-color: rgba(255, 193, 7, 0.3);
+  color: rgba(255, 235, 59, 1);
+  border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.confidence-low {
+  background-color: rgba(158, 158, 158, 0.3);
+  color: rgba(189, 189, 189, 1);
+  border: 1px solid rgba(158, 158, 158, 0.5);
+}
+
+.signal-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.overall-score {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.score-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.score-value {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.feedback-metrics {
+  margin-bottom: 1.5rem;
+}
+
+.feedback-metrics h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  background-color: rgba(100, 108, 255, 0.08);
+  border: 1px solid rgba(100, 108, 255, 0.25);
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.2);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.metric-icon {
+  font-size: 1.5rem;
+}
+
+.metric-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.metric-score {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #646cff;
+  margin-bottom: 0.5rem;
+}
+
+.metric-detail {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.feedback-suggestions {
+  background-color: rgba(100, 108, 255, 0.08);
+  border: 1px solid rgba(100, 108, 255, 0.25);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.feedback-suggestions h3 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.feedback-suggestions ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.feedback-suggestions li {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+.feedback-suggestions li:last-child {
+  margin-bottom: 0;
+}
+
 @media (prefers-color-scheme: light) {
   .placeholder-content {
     background-color: rgba(83, 91, 242, 0.05);
@@ -259,5 +476,113 @@
   .save-button:hover {
     background-color: rgba(83, 91, 242, 0.2);
     border-color: rgba(83, 91, 242, 0.6);
+  }
+
+  /* NLP Feedback Light Mode */
+  .nlp-feedback-container {
+    background-color: rgba(83, 91, 242, 0.03);
+    border: 1px solid rgba(83, 91, 242, 0.2);
+  }
+
+  .feedback-disclaimer {
+    background-color: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.4);
+  }
+
+  .feedback-disclaimer p {
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .feedback-signal-card {
+    background: linear-gradient(135deg, rgba(83, 91, 242, 0.15) 0%, rgba(83, 91, 242, 0.05) 100%);
+    border: 2px solid rgba(83, 91, 242, 0.3);
+  }
+
+  .feedback-signal-card.signal-originality-likely {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.25) 0%, rgba(76, 175, 80, 0.08) 100%);
+    border-color: rgba(76, 175, 80, 0.6);
+  }
+
+  .feedback-signal-card.signal-needs-review {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.25) 0%, rgba(255, 193, 7, 0.08) 100%);
+    border-color: rgba(255, 193, 7, 0.6);
+  }
+
+  .feedback-signal-card.signal-low-conceptual-depth {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.25) 0%, rgba(244, 67, 54, 0.08) 100%);
+    border-color: rgba(244, 67, 54, 0.6);
+  }
+
+  .signal-header h3 {
+    color: rgba(0, 0, 0, 0.95);
+  }
+
+  .confidence-high {
+    background-color: rgba(76, 175, 80, 0.25);
+    color: rgba(27, 94, 32, 1);
+  }
+
+  .confidence-medium {
+    background-color: rgba(255, 193, 7, 0.25);
+    color: rgba(245, 127, 23, 1);
+  }
+
+  .confidence-low {
+    background-color: rgba(158, 158, 158, 0.25);
+    color: rgba(66, 66, 66, 1);
+  }
+
+  .signal-description {
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .score-label {
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  .score-value {
+    color: rgba(0, 0, 0, 0.95);
+  }
+
+  .overall-score {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .feedback-metrics h3 {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .metric-card {
+    background-color: rgba(83, 91, 242, 0.08);
+    border: 1px solid rgba(83, 91, 242, 0.25);
+  }
+
+  .metric-card:hover {
+    box-shadow: 0 4px 12px rgba(83, 91, 242, 0.2);
+  }
+
+  .metric-header h4 {
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .metric-score {
+    color: #535bf2;
+  }
+
+  .metric-detail {
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  .feedback-suggestions {
+    background-color: rgba(83, 91, 242, 0.08);
+    border: 1px solid rgba(83, 91, 242, 0.25);
+  }
+
+  .feedback-suggestions h3 {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .feedback-suggestions li {
+    color: rgba(0, 0, 0, 0.8);
   }
 }

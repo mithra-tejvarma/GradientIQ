@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './Page.css';
+import { generateNLPSignals } from '../utils/nlpAnalysis';
 
 function AssessmentPage() {
   // Mock data structure for subjects and concepts
@@ -90,6 +91,8 @@ function AssessmentPage() {
   // State management
   const [selectedSubject, setSelectedSubject] = useState('Coding');
   const [selectedConcept, setSelectedConcept] = useState('Loops');
+  const [answerText, setAnswerText] = useState('');
+  const [nlpFeedback, setNlpFeedback] = useState(null);
 
   // Get current question based on selected concept
   const currentQuestion = mockQuestions[selectedConcept] || {
@@ -99,7 +102,19 @@ function AssessmentPage() {
 
   // Placeholder handlers
   const handleSubmit = () => {
-    console.log('Submit clicked - logic to be implemented');
+    console.log('Submit clicked - analyzing answer...');
+    
+    // Generate NLP analysis
+    const analysis = generateNLPSignals(answerText, selectedConcept);
+    setNlpFeedback(analysis);
+    
+    // Scroll to feedback section
+    setTimeout(() => {
+      document.querySelector('.feedback-section')?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
   };
 
   const handleSaveProgress = () => {
@@ -111,10 +126,14 @@ function AssessmentPage() {
     // Set first concept of the new subject as selected
     const firstConcept = subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
+    // Clear feedback when changing subject
+    setNlpFeedback(null);
   };
 
   const handleConceptChange = (concept) => {
     setSelectedConcept(concept);
+    // Clear feedback when changing concept
+    setNlpFeedback(null);
   };
 
   return (
@@ -179,6 +198,8 @@ function AssessmentPage() {
           className="answer-input"
           placeholder="Type your answer here... You can write explanations, steps, or code."
           rows="10"
+          value={answerText}
+          onChange={(e) => setAnswerText(e.target.value)}
         />
       </section>
 
@@ -194,12 +215,106 @@ function AssessmentPage() {
         </div>
       </section>
 
-      {/* Feedback Placeholder Section */}
-      <section className="assessment-section">
+      {/* Feedback Section */}
+      <section className="assessment-section feedback-section">
         <h2>Feedback</h2>
-        <div className="placeholder-content">
-          <p>Feedback will appear here showing where you are strong or stuck.</p>
-        </div>
+        {!nlpFeedback ? (
+          <div className="placeholder-content">
+            <p>Submit your answer to receive feedback on your response quality.</p>
+          </div>
+        ) : (
+          <div className="nlp-feedback-container">
+            {/* Disclaimer */}
+            <div className="feedback-disclaimer">
+              <span className="disclaimer-icon">ℹ️</span>
+              <p>
+                <strong>Note:</strong> This is a heuristic analysis providing probabilistic indicators, 
+                not definitive judgments. Results are meant as constructive feedback.
+              </p>
+            </div>
+
+            {/* Main Signal Card */}
+            <div className={`feedback-signal-card signal-${nlpFeedback.signal.toLowerCase().replace(/\s+/g, '-')}`}>
+              <div className="signal-header">
+                <h3>{nlpFeedback.signal}</h3>
+                <span className={`confidence-badge confidence-${nlpFeedback.confidence}`}>
+                  {nlpFeedback.confidence} confidence
+                </span>
+              </div>
+              <p className="signal-description">{nlpFeedback.description}</p>
+              <div className="overall-score">
+                <span className="score-label">Overall Score:</span>
+                <span className="score-value">{nlpFeedback.overallScore}/100</span>
+              </div>
+            </div>
+
+            {/* Detailed Metrics */}
+            <div className="feedback-metrics">
+              <h3>Analysis Details</h3>
+              <div className="metrics-grid">
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <span className="metric-icon">🔑</span>
+                    <h4>Concept Keywords</h4>
+                  </div>
+                  <div className="metric-score">{nlpFeedback.details.keywords.score}/100</div>
+                  <p className="metric-detail">
+                    {nlpFeedback.details.keywords.matchedKeywords.length} of {nlpFeedback.details.keywords.totalKeywords} key terms found
+                  </p>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <span className="metric-icon">📊</span>
+                    <h4>Logical Flow</h4>
+                  </div>
+                  <div className="metric-score">{nlpFeedback.details.flow.score}/100</div>
+                  <p className="metric-detail">
+                    {nlpFeedback.details.flow.structured ? 'Structured response' : 'Could be more organized'}
+                  </p>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <span className="metric-icon">🔄</span>
+                    <h4>Repetition Check</h4>
+                  </div>
+                  <div className="metric-score">{nlpFeedback.details.repetition.score}/100</div>
+                  <p className="metric-detail">
+                    {nlpFeedback.details.repetition.hasHighRepetition 
+                      ? 'Some repetitive patterns detected' 
+                      : 'Good variety in expression'}
+                  </p>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <span className="metric-icon">📝</span>
+                    <h4>Content Pattern</h4>
+                  </div>
+                  <div className="metric-score">{nlpFeedback.details.paste.score}/100</div>
+                  <p className="metric-detail">
+                    {nlpFeedback.details.paste.possiblePaste 
+                      ? 'Large text blocks detected' 
+                      : 'Natural writing pattern'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Suggestions */}
+            {nlpFeedback.suggestions.length > 0 && (
+              <div className="feedback-suggestions">
+                <h3>Suggestions for Improvement</h3>
+                <ul>
+                  {nlpFeedback.suggestions.map((suggestion, index) => (
+                    <li key={index}>{suggestion}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
       </section>
     </div>
   );
