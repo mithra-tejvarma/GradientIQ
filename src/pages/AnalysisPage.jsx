@@ -1,15 +1,95 @@
 import './Page.css';
 import './AnalysisPage.css';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Radar } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 function AnalysisPage() {
-  // Mock data for the 5 learning metrics
-  const learningMetrics = [
-    { name: 'Streak', value: '4 days', icon: '🔥' },
-    { name: 'Reasoning / IQ', value: '72%', icon: '🧠' },
-    { name: 'Learning Depth', value: '65%', icon: '📚' },
-    { name: 'Accuracy', value: '78%', icon: '🎯' },
-    { name: 'Growth', value: '+8%', icon: '📈' }
-  ];
+  // Mock data for the radar chart - 5 metrics
+  const radarData = {
+    labels: ['Speed', 'Reliability', 'Comfort', 'Safety', 'Efficiency'],
+    datasets: [
+      {
+        label: 'Learning Metrics',
+        data: [75, 60, 70, 55, 65],
+        backgroundColor: 'rgba(100, 108, 255, 0.2)',
+        borderColor: 'rgba(100, 108, 255, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(100, 108, 255, 1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(100, 108, 255, 1)'
+      }
+    ]
+  };
+
+  const radarOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 20,
+          color: 'rgba(255, 255, 255, 0.6)',
+          backdropColor: 'transparent',
+          font: {
+            size: 12
+          }
+        },
+        grid: {
+          color: 'rgba(100, 108, 255, 0.3)'
+        },
+        pointLabels: {
+          color: 'rgba(255, 255, 255, 0.95)',
+          font: {
+            size: 16,
+            weight: '600'
+          }
+        },
+        angleLines: {
+          color: 'rgba(100, 108, 255, 0.3)'
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'rgba(255, 255, 255, 0.9)',
+        bodyColor: 'rgba(255, 255, 255, 0.9)',
+        borderColor: 'rgba(100, 108, 255, 0.5)',
+        borderWidth: 1,
+        padding: 12,
+        displayColors: false,
+        callbacks: {
+          label: function(context) {
+            return context.parsed.r + ' / 100';
+          }
+        }
+      }
+    }
+  };
 
   // Mock data for leaderboard
   const leaderboardData = [
@@ -26,25 +106,9 @@ function AnalysisPage() {
       <section className="analysis-section">
         <h2 className="section-heading">Learning Analysis</h2>
         <div className="analysis-wheel-container">
-          <div className="analysis-wheel-placeholder">
-            <div className="wheel-center">
-              <span className="wheel-icon">📊</span>
-            </div>
-            <div className="metrics-list">
-              {learningMetrics.map((metric) => (
-                <div key={metric.name} className="metric-item">
-                  <span className="metric-icon">{metric.icon}</span>
-                  <div className="metric-content">
-                    <div className="metric-name">{metric.name}</div>
-                    <div className="metric-value">{metric.value}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="radar-chart-wrapper">
+            <Radar data={radarData} options={radarOptions} />
           </div>
-          <p className="wheel-description">
-            Analysis wheel will visualize these 5 learning metrics.
-          </p>
         </div>
       </section>
 
