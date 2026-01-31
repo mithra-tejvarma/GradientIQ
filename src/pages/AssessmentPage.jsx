@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import './Page.css';
 import ConceptAssessmentView from '../components/ConceptAssessmentView';
 
@@ -125,13 +125,9 @@ function AssessmentPage() {
 
   const handleSubjectChange = (subject) => {
     setSelectedSubject(subject);
-    // Set first unlocked concept of the new subject as selected
-    const unlockedForSubject = unlockedConcepts[subject] || [];
-    const firstConcept = unlockedForSubject[0] || subjects[subject].concepts[0];
+    // Set first concept of the new subject as selected
+    const firstConcept = subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
-    // Clear feedback and answer when changing subject
-    setNlpFeedback(null);
-    setAnswerText('');
   };
 
   const handleConceptChange = (concept) => {

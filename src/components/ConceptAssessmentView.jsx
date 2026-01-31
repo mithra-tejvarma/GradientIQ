@@ -37,12 +37,10 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
     }, 1000);
     
     // Set inactivity timeout to show feedback after prolonged inactivity (mock condition)
-    inactivityTimeoutRef.current = setTimeout(() => {
-      if (!showFeedback) {
-        console.log('User stopped progressing - showing feedback (mock condition)');
-        setShowFeedback(true);
-      }
+    const inactivityTimeout = setTimeout(() => {
+      setShowFeedback(true);
     }, INACTIVITY_THRESHOLD_MS);
+    inactivityTimeoutRef.current = inactivityTimeout;
     
     // Cleanup on unmount
     return () => {
@@ -95,10 +93,8 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       clearTimeout(inactivityTimeoutRef.current);
     }
     inactivityTimeoutRef.current = setTimeout(() => {
-      if (!showFeedback) {
-        console.log('User stopped progressing - showing feedback (mock condition)');
-        setShowFeedback(true);
-      }
+      console.log('User stopped progressing - showing feedback (mock condition)');
+      setShowFeedback(true);
     }, INACTIVITY_THRESHOLD_MS);
     
     // Set typing to false after threshold of inactivity
