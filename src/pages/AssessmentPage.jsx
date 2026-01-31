@@ -12,7 +12,6 @@ const PASTE_DETECTION_DELAY_MS = 500;
 const MAX_TYPING_EVENTS = 100; // Limit array size to prevent memory issues
 
 function AssessmentPage() {
-
   // Mock data structure for subjects and concepts
   const subjects = {
     'Coding': {
@@ -153,12 +152,15 @@ function AssessmentPage() {
     // Detect incremental typing (small changes, frequent updates)
     if (typingEvents.current.length > 1) {
       const recentEvents = typingEvents.current.slice(-5);
-      const hasSmallChanges = recentEvents.every(event => event.changeSize <= SMALL_CHANGE_THRESHOLD);
-      const hasFrequentUpdates = recentEvents.length >= 3 && 
-        (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < FREQUENT_TYPING_WINDOW_MS;
-      
-      if (hasSmallChanges && hasFrequentUpdates) {
-        hasTypedIncrementally.current = true;
+      // Ensure we have enough events to analyze
+      if (recentEvents.length >= 3) {
+        const hasSmallChanges = recentEvents.every(event => event.changeSize <= SMALL_CHANGE_THRESHOLD);
+        const hasFrequentUpdates = 
+          (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < FREQUENT_TYPING_WINDOW_MS;
+        
+        if (hasSmallChanges && hasFrequentUpdates) {
+          hasTypedIncrementally.current = true;
+        }
       }
     }
     
