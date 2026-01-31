@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import './ConceptAssessmentView.css';
 
+// Constants
+const PAUSE_THRESHOLD_MS = 2000; // Time threshold for detecting a pause (in milliseconds)
+
 function ConceptAssessmentView({ subject, concept, question, onBack }) {
   // Answer state
   const [answer, setAnswer] = useState('');
@@ -54,8 +57,8 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       textLength: newValue.length
     }]);
     
-    // Detect pause (if more than 2 seconds since last keystroke, it was a pause)
-    if (timeSinceLastKeystroke > 2000 && lastKeystrokeRef.current && lastKeystrokeRef.current !== startTimeRef.current) {
+    // Detect pause (if more than threshold since last keystroke, it was a pause)
+    if (timeSinceLastKeystroke > PAUSE_THRESHOLD_MS && lastKeystrokeRef.current && lastKeystrokeRef.current !== startTimeRef.current) {
       setPauseLog(prev => [...prev, {
         startTime: lastKeystrokeRef.current,
         endTime: now,
@@ -71,10 +74,10 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       clearTimeout(typingTimeoutRef.current);
     }
     
-    // Set typing to false after 2 seconds of inactivity
+    // Set typing to false after threshold of inactivity
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-    }, 2000);
+    }, PAUSE_THRESHOLD_MS);
   };
   
   // Format time display
@@ -97,7 +100,7 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       totalKeystrokes: keystrokeLog.length,
       totalPauses: pauseLog.length,
       averageKeystrokeInterval: keystrokeLog.length > 1 
-        ? keystrokeLog.reduce((sum, log) => sum + log.timeSinceLastKeystroke, 0) / keystrokeLog.length
+        ? keystrokeLog.slice(1).reduce((sum, log) => sum + log.timeSinceLastKeystroke, 0) / (keystrokeLog.length - 1)
         : 0,
       longestPause: pauseLog.length > 0 
         ? Math.max(...pauseLog.map(p => p.duration))
@@ -213,7 +216,7 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
           <div className="tracking-details">
             <p><strong>Time Spent:</strong> {formatTime(timeSpent)}</p>
             <p><strong>Total Keystrokes:</strong> {keystrokeLog.length}</p>
-            <p><strong>Total Pauses ({">"} 2s):</strong> {pauseLog.length}</p>
+            <p><strong>Total Pauses ({'>'}  {PAUSE_THRESHOLD_MS / 1000}s):</strong> {pauseLog.length}</p>
             {pauseLog.length > 0 && (
               <p><strong>Longest Pause:</strong> {Math.max(...pauseLog.map(p => p.duration)) / 1000}s</p>
             )}
