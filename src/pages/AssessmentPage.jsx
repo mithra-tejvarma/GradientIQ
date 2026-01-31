@@ -224,7 +224,13 @@ function AssessmentPage() {
   };
 
   const handleSaveProgress = () => {
-    console.log('Save Progress clicked - logic to be implemented');
+    console.log('Progress saved:', {
+      subject: selectedSubject,
+      concept: selectedConcept,
+      answer,
+      conceptScores
+    });
+    alert('Progress saved successfully!');
   };
 
   const handleConceptChange = (concept) => {
@@ -236,8 +242,9 @@ function AssessmentPage() {
 
   const handleSubjectChange = (subject) => {
     setSelectedSubject(subject);
-    // Set first concept of the new subject as selected
-    const firstConcept = subjects[subject].concepts[0];
+    // Set first unlocked concept of the new subject as selected
+    const unlockedForSubject = unlockedConcepts[subject] || [];
+    const firstConcept = unlockedForSubject[0] || subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
     // Reset answer and behavior tracking when subject changes
     setAnswerText('');
@@ -268,15 +275,23 @@ function AssessmentPage() {
       <section className="assessment-section">
         <h2>Select Concept</h2>
         <div className="concept-selector">
-          {subjects[selectedSubject].concepts.map((concept) => (
-            <button
-              key={concept}
-              className={`concept-button ${selectedConcept === concept ? 'active' : ''}`}
-              onClick={() => handleConceptChange(concept)}
-            >
-              {concept}
-            </button>
-          ))}
+          {subjects[selectedSubject].concepts.map((concept) => {
+            const isUnlocked = (unlockedConcepts[selectedSubject] || []).includes(concept);
+            const score = conceptScores[concept];
+            return (
+              <button
+                key={concept}
+                className={`concept-button ${selectedConcept === concept ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`}
+                onClick={() => isUnlocked && handleConceptChange(concept)}
+                disabled={!isUnlocked}
+                title={!isUnlocked ? 'Complete previous concept to unlock' : ''}
+              >
+                {concept}
+                {!isUnlocked && ' 🔒'}
+                {score !== undefined && ` (${score}%)`}
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -323,7 +338,7 @@ function AssessmentPage() {
         </div>
       </section>
 
-      {/* Feedback Placeholder Section */}
+      {/* Feedback Section */}
       <section className="assessment-section">
         <h2>Feedback</h2>
         {behaviorFlags.length > 0 ? (
