@@ -24,7 +24,7 @@ ChartJS.register(
 function AnalysisPage() {
   // Mock data for the radar chart - 5 metrics
   const radarData = {
-    labels: ['Speed', 'Reliability', 'Comfort', 'Safety', 'Efficiency'],
+    labels: ['IQ / Reasoning', 'Learning Depth', 'Accuracy', 'Consistency', 'Growth'],
     datasets: [
       {
         label: 'Learning Metrics',
