@@ -35,7 +35,7 @@ export function analyzeConceptKeywords(answer, concept) {
   
   // Count keyword matches
   const matchedKeywords = keywords.filter(keyword => 
-    answerLower.includes(keyword.toLowerCase())
+    answerLower.includes(keyword)
   );
   
   const score = keywords.length > 0 
@@ -155,7 +155,6 @@ export function analyzePastePatterns(answer) {
   const lines = answer.split('\n').filter(line => line.trim().length > 0);
   
   // Heuristic: Very long continuous blocks might indicate paste
-  const averageLineLength = answer.length / Math.max(lines.length, 1);
   const hasVeryLongLines = lines.some(line => line.length > 200);
   const hasUniformStructure = lines.length > 5 && 
     lines.every(line => line.length > 50 && line.length < 150);
@@ -177,7 +176,6 @@ export function analyzePastePatterns(answer) {
   return {
     score: Math.round(score),
     possiblePaste,
-    averageLineLength: Math.round(averageLineLength),
     indicatorCount,
     confidence: indicatorCount >= 3 ? 'high' : indicatorCount >= 2 ? 'medium' : 'low'
   };

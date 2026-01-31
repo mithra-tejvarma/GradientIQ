@@ -126,8 +126,9 @@ function AssessmentPage() {
     // Set first concept of the new subject as selected
     const firstConcept = subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
-    // Clear feedback when changing subject
+    // Clear feedback and answer when changing subject
     setNlpFeedback(null);
+    setAnswerText('');
   };
 
   const handleConceptChange = (concept) => {
