@@ -2,6 +2,7 @@ import './Page.css';
 import './DashboardOverview.css';
 import StatCard from '../components/StatCard';
 import ProgressBar from '../components/ProgressBar';
+import TopicCard from '../components/TopicCard';
 
 function DashboardOverview() {
   // Mock data for dashboard
@@ -35,7 +36,7 @@ function DashboardOverview() {
         <h2 className="section-heading">Topic-Wise Capability Levels</h2>
         <div className="topics-grid">
           {topicCapabilities.map((item) => (
-            <ProgressBar
+            <TopicCard
               key={item.topic}
               topic={item.topic}
               percentage={item.percentage}

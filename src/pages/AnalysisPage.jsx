@@ -2,13 +2,13 @@ import './Page.css';
 import './AnalysisPage.css';
 
 function AnalysisPage() {
-  // Mock data for the 5 learning metrics
-  const learningMetrics = [
-    { name: 'Streak', value: '4 days', icon: '🔥' },
-    { name: 'Reasoning / IQ', value: '72%', icon: '🧠' },
-    { name: 'Learning Depth', value: '65%', icon: '📚' },
-    { name: 'Accuracy', value: '78%', icon: '🎯' },
-    { name: 'Growth', value: '+8%', icon: '📈' }
+  // Mock data for the 5 skills with values 0-100
+  const skillsData = [
+    { name: 'Streak', value: 80 },
+    { name: 'Reasoning', value: 65 },
+    { name: 'Learning Depth', value: 70 },
+    { name: 'Accuracy', value: 60 },
+    { name: 'Growth', value: 75 }
   ];
 
   // Mock data for leaderboard
@@ -25,26 +25,20 @@ function AnalysisPage() {
       {/* Analysis Wheel Section */}
       <section className="analysis-section">
         <h2 className="section-heading">Learning Analysis</h2>
-        <div className="analysis-wheel-container">
-          <div className="analysis-wheel-placeholder">
-            <div className="wheel-center">
-              <span className="wheel-icon">📊</span>
-            </div>
-            <div className="metrics-list">
-              {learningMetrics.map((metric) => (
-                <div key={metric.name} className="metric-item">
-                  <span className="metric-icon">{metric.icon}</span>
-                  <div className="metric-content">
-                    <div className="metric-name">{metric.name}</div>
-                    <div className="metric-value">{metric.value}</div>
-                  </div>
+        <div className="skill-graph-container">
+          {skillsData.map((skill) => (
+            <div key={skill.name} className="skill-bar-item">
+              <div className="skill-label">{skill.name}</div>
+              <div className="skill-bar-track">
+                <div 
+                  className="skill-bar-fill" 
+                  style={{ width: `${skill.value}%` }}
+                >
+                  <span className="skill-bar-value">{skill.value}</span>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-          <p className="wheel-description">
-            Analysis wheel will visualize these 5 learning metrics.
-          </p>
+          ))}
         </div>
       </section>
 

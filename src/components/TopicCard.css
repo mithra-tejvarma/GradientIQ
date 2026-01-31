@@ -1,0 +1,69 @@
+.topic-card {
+  background-color: rgba(100, 108, 255, 0.08);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.topic-card:hover {
+  background-color: rgba(100, 108, 255, 0.12);
+  border-color: rgba(100, 108, 255, 0.3);
+}
+
+.topic-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  width: 100%;
+}
+
+.topic-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.topic-percentage {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #646cff;
+}
+
+.topic-stars {
+  display: flex;
+  gap: 0.2rem;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.star {
+  display: inline-block;
+}
+
+@media (prefers-color-scheme: light) {
+  .topic-card {
+    background-color: rgba(83, 91, 242, 0.08);
+    border: 1px solid rgba(83, 91, 242, 0.2);
+  }
+
+  .topic-card:hover {
+    background-color: rgba(83, 91, 242, 0.12);
+    border-color: rgba(83, 91, 242, 0.3);
+  }
+
+  .topic-name {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .topic-percentage {
+    color: #535bf2;
+  }
+}

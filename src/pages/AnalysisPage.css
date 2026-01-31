@@ -12,7 +12,75 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Analysis Wheel Styles */
+/* Skill Graph Styles */
+.skill-graph-container {
+  background-color: rgba(100, 108, 255, 0.05);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.skill-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.skill-label {
+  min-width: 140px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: right;
+}
+
+.skill-bar-track {
+  flex: 1;
+  height: 36px;
+  background-color: rgba(100, 108, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #646cff 0%, #535bf2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.75rem;
+  min-width: 40px;
+}
+
+.skill-bar-value {
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .skill-bar-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .skill-label {
+    min-width: auto;
+    text-align: left;
+  }
+
+  .skill-bar-track {
+    width: 100%;
+  }
+}
+
+/* Analysis Wheel Styles - keeping old styles for reference */
 .analysis-wheel-container {
   background-color: rgba(100, 108, 255, 0.05);
   border: 1px solid rgba(100, 108, 255, 0.2);
@@ -175,6 +243,23 @@
 @media (prefers-color-scheme: light) {
   .section-heading {
     color: rgba(0, 0, 0, 0.9);
+  }
+
+  .skill-graph-container {
+    background-color: rgba(83, 91, 242, 0.05);
+    border: 1px solid rgba(83, 91, 242, 0.2);
+  }
+
+  .skill-label {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .skill-bar-track {
+    background-color: rgba(83, 91, 242, 0.1);
+  }
+
+  .skill-bar-fill {
+    background: linear-gradient(90deg, #535bf2 0%, #747bff 100%);
   }
 
   .analysis-wheel-container,
