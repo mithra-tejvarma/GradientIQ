@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Page.css';
 
 function AssessmentPage() {
@@ -90,6 +90,22 @@ function AssessmentPage() {
   // State management
   const [selectedSubject, setSelectedSubject] = useState('Coding');
   const [selectedConcept, setSelectedConcept] = useState('Loops');
+  const [answerText, setAnswerText] = useState('');
+  const [behaviorFlags, setBehaviorFlags] = useState([]);
+  
+  // Behavior tracking refs
+  const questionLoadTime = useRef(null);
+  const typingEvents = useRef([]);
+  const lastActivityTime = useRef(null);
+  const hasTypedIncrementally = useRef(false);
+
+  // Initialize refs on mount
+  useEffect(() => {
+    if (questionLoadTime.current === null) {
+      questionLoadTime.current = Date.now();
+      lastActivityTime.current = Date.now();
+    }
+  }, []);
 
   // Get current question based on selected concept
   const currentQuestion = mockQuestions[selectedConcept] || {
@@ -97,9 +113,96 @@ function AssessmentPage() {
     questionText: 'Question not available.'
   };
 
+  // Reset behavior tracking when question changes
+  useEffect(() => {
+    questionLoadTime.current = Date.now();
+    typingEvents.current = [];
+    lastActivityTime.current = Date.now();
+    hasTypedIncrementally.current = false;
+  }, [selectedConcept]);
+
+  // Handle typing in the answer textarea
+  const handleAnswerChange = (e) => {
+    const newText = e.target.value;
+    const currentTime = Date.now();
+    const timeSinceLastActivity = currentTime - lastActivityTime.current;
+    
+    // Track typing event
+    typingEvents.current.push({
+      timestamp: currentTime,
+      textLength: newText.length,
+      changeSize: Math.abs(newText.length - answerText.length)
+    });
+    
+    // Detect incremental typing (small changes, frequent updates)
+    if (typingEvents.current.length > 1) {
+      const recentEvents = typingEvents.current.slice(-5);
+      const hasSmallChanges = recentEvents.every(event => event.changeSize <= 3);
+      const hasFrequentUpdates = recentEvents.length >= 3 && 
+        (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < 5000;
+      
+      if (hasSmallChanges && hasFrequentUpdates) {
+        hasTypedIncrementally.current = true;
+      }
+    }
+    
+    // Detect large paste (sudden large text addition)
+    const changeSize = Math.abs(newText.length - answerText.length);
+    if (changeSize > 50 && timeSinceLastActivity > 500) {
+      // This looks like a paste rather than typing
+      hasTypedIncrementally.current = false;
+    }
+    
+    lastActivityTime.current = currentTime;
+    setAnswerText(newText);
+  };
+
+  // Analyze behavior patterns
+  const analyzeBehaviorPatterns = () => {
+    const flags = [];
+    const currentTime = Date.now();
+    const timeSinceQuestionLoad = (currentTime - questionLoadTime.current) / 1000; // in seconds
+    
+    // Pattern 1: Long inactivity pause after question load
+    if (typingEvents.current.length > 0) {
+      const firstTypingTime = typingEvents.current[0].timestamp;
+      const inactivityBeforeTyping = (firstTypingTime - questionLoadTime.current) / 1000;
+      
+      if (inactivityBeforeTyping > 30) {
+        flags.push({
+          type: 'inactivity',
+          message: 'Possible lack of clarity',
+          details: 'We noticed a pause before starting. If the question was unclear, feel free to ask for clarification or review the concept materials.'
+        });
+      }
+    }
+    
+    // Pattern 2: Very fast full answer submission
+    if (timeSinceQuestionLoad < 10 && answerText.length > 50) {
+      flags.push({
+        type: 'fast-submission',
+        message: 'Answer confidence low',
+        details: 'You submitted quickly! Take your time to review your answer and ensure you\'ve covered all aspects of the question.'
+      });
+    }
+    
+    // Pattern 3: No incremental typing (possible paste)
+    if (!hasTypedIncrementally.current && answerText.length > 100) {
+      flags.push({
+        type: 'no-incremental',
+        message: 'Review fundamentals recommended',
+        details: 'Your answer appears complete. Consider reviewing the fundamental concepts to strengthen your understanding and build confidence.'
+      });
+    }
+    
+    return flags;
+  };
+
   // Placeholder handlers
   const handleSubmit = () => {
-    console.log('Submit clicked - logic to be implemented');
+    const detectedFlags = analyzeBehaviorPatterns();
+    setBehaviorFlags(detectedFlags);
+    console.log('Submit clicked - behavior flags:', detectedFlags);
   };
 
   const handleSaveProgress = () => {
@@ -111,10 +214,16 @@ function AssessmentPage() {
     // Set first concept of the new subject as selected
     const firstConcept = subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
+    // Reset answer and behavior tracking when subject changes
+    setAnswerText('');
+    setBehaviorFlags([]);
   };
 
   const handleConceptChange = (concept) => {
     setSelectedConcept(concept);
+    // Reset answer and behavior tracking when concept changes
+    setAnswerText('');
+    setBehaviorFlags([]);
   };
 
   return (
@@ -179,6 +288,8 @@ function AssessmentPage() {
           className="answer-input"
           placeholder="Type your answer here... You can write explanations, steps, or code."
           rows="10"
+          value={answerText}
+          onChange={handleAnswerChange}
         />
       </section>
 
@@ -197,9 +308,20 @@ function AssessmentPage() {
       {/* Feedback Placeholder Section */}
       <section className="assessment-section">
         <h2>Feedback</h2>
-        <div className="placeholder-content">
-          <p>Feedback will appear here showing where you are strong or stuck.</p>
-        </div>
+        {behaviorFlags.length > 0 ? (
+          <div className="behavior-feedback">
+            {behaviorFlags.map((flag, index) => (
+              <div key={index} className="feedback-card">
+                <h3 className="feedback-title">💡 {flag.message}</h3>
+                <p className="feedback-details">{flag.details}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="placeholder-content">
+            <p>Feedback will appear here showing where you are strong or stuck.</p>
+          </div>
+        )}
       </section>
     </div>
   );
