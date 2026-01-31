@@ -22,6 +22,111 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* Assessment Page Specific Styles */
+.assessment-section {
+  margin-bottom: 2rem;
+}
+
+.assessment-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.question-details {
+  background-color: rgba(100, 108, 255, 0.1);
+  border: 1px solid rgba(100, 108, 255, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-item strong {
+  color: rgba(255, 255, 255, 0.95);
+  margin-right: 0.5rem;
+}
+
+.question-text {
+  background-color: rgba(100, 108, 255, 0.05);
+  border-left: 4px solid #646cff;
+  padding: 1.5rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.question-text p {
+  margin: 0;
+}
+
+.answer-input {
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(100, 108, 255, 0.3);
+  border-radius: 8px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.answer-input:focus {
+  outline: none;
+  border-color: #646cff;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.submit-button,
+.save-button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button {
+  background-color: #646cff;
+  color: white;
+  border: 1px solid #646cff;
+}
+
+.submit-button:hover {
+  background-color: #535bf2;
+  border-color: #535bf2;
+}
+
+.save-button {
+  background-color: rgba(100, 108, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(100, 108, 255, 0.4);
+}
+
+.save-button:hover {
+  background-color: rgba(100, 108, 255, 0.3);
+  border-color: rgba(100, 108, 255, 0.6);
+}
+
 @media (prefers-color-scheme: light) {
   .placeholder-content {
     background-color: rgba(83, 91, 242, 0.05);
@@ -30,5 +135,60 @@
 
   .placeholder-content p {
     color: rgba(0, 0, 0, 0.7);
+  }
+
+  .assessment-section h2 {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .question-details {
+    background-color: rgba(83, 91, 242, 0.1);
+    border: 1px solid rgba(83, 91, 242, 0.3);
+  }
+
+  .detail-item {
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .detail-item strong {
+    color: rgba(0, 0, 0, 0.95);
+  }
+
+  .question-text {
+    background-color: rgba(83, 91, 242, 0.05);
+    border-left: 4px solid #535bf2;
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .answer-input {
+    background-color: rgba(83, 91, 242, 0.05);
+    color: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(83, 91, 242, 0.3);
+  }
+
+  .answer-input:focus {
+    border-color: #535bf2;
+    background-color: rgba(83, 91, 242, 0.1);
+  }
+
+  .submit-button {
+    background-color: #535bf2;
+    border: 1px solid #535bf2;
+  }
+
+  .submit-button:hover {
+    background-color: #747bff;
+    border-color: #747bff;
+  }
+
+  .save-button {
+    background-color: rgba(83, 91, 242, 0.1);
+    color: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(83, 91, 242, 0.4);
+  }
+
+  .save-button:hover {
+    background-color: rgba(83, 91, 242, 0.2);
+    border-color: rgba(83, 91, 242, 0.6);
   }
 }
