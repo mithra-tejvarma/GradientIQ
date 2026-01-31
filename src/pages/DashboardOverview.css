@@ -1,0 +1,39 @@
+.dashboard-section {
+  margin-bottom: 3rem;
+}
+
+.dashboard-section-half {
+  flex: 1;
+  min-width: 300px;
+}
+
+.dashboard-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.topics-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.progress-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .section-heading {
+    color: rgba(0, 0, 0, 0.9);
+  }
+}
