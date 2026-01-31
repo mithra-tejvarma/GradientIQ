@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine
 from app.db.base import Base
-from app.routes import students_router, subjects_router, topics_router, assessment_router, feedback_router
+from app.routes import students_router, subjects_router, topics_router, assessment_router, feedback_router, capability_router, faculty_router
 
 
 @asynccontextmanager
@@ -37,6 +37,8 @@ app.include_router(subjects_router, prefix="/subjects", tags=["subjects"])
 app.include_router(topics_router, prefix="/topics", tags=["topics"])
 app.include_router(assessment_router, prefix="/assessments", tags=["assessments"])
 app.include_router(feedback_router, prefix="/feedback", tags=["feedback"])
+app.include_router(capability_router, prefix="/capability", tags=["capability"])
+app.include_router(faculty_router, prefix="/faculty", tags=["faculty"])
 
 # Root endpoint
 @app.get("/")

@@ -4,6 +4,7 @@ from typing import List
 from app.dependencies import get_db
 from app.models.assessment import Assessment
 from app.schemas.assessment import AssessmentCreateSchema, AssessmentResponseSchema
+from app.services.capability_service import update_capability
 
 router = APIRouter()
 
@@ -26,8 +27,21 @@ def create_assessment(assessment: AssessmentCreateSchema, db: Session = Depends(
         status=status
     )
     db.add(db_assessment)
+    db.flush()
+
+    # Update capability based on assessment outcome
+    update_capability(
+        db=db,
+        student_id=assessment.student_id,
+        subject_id=assessment.subject_id,
+        topic_id=assessment.topic_id,
+        status=status
+    )
+
+    # Commit both assessment and capability updates together
     db.commit()
     db.refresh(db_assessment)
+
     return db_assessment
 
 
