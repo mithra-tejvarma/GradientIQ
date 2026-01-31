@@ -399,6 +399,249 @@
   }
 }
 
+/* Feedback Section Styles */
+.feedback-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(100, 108, 255, 0.3);
+}
+
+.feedback-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.feedback-header h2 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.feedback-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-style: italic;
+}
+
+.feedback-container {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.feedback-block {
+  background-color: rgba(100, 108, 255, 0.05);
+  border: 2px solid rgba(100, 108, 255, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feedback-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.2);
+}
+
+.feedback-block-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-icon {
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-block-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.feedback-content p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.feedback-content p:first-child {
+  margin-top: 0;
+}
+
+.feedback-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Feedback block variants */
+.feedback-positive {
+  border-color: rgba(76, 175, 80, 0.5);
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.03) 100%);
+}
+
+.feedback-positive:hover {
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.feedback-warning {
+  border-color: rgba(255, 193, 7, 0.5);
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.03) 100%);
+}
+
+.feedback-warning:hover {
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.feedback-info {
+  border-color: rgba(33, 150, 243, 0.5);
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.03) 100%);
+}
+
+.feedback-info:hover {
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.feedback-suggestion {
+  border-color: rgba(156, 39, 176, 0.5);
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(156, 39, 176, 0.03) 100%);
+}
+
+.feedback-suggestion:hover {
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.2);
+}
+
+/* Feedback Actions */
+.feedback-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.retry-button,
+.next-button {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button {
+  background-color: #646cff;
+  color: white;
+  border: 2px solid #646cff;
+}
+
+.retry-button:hover {
+  background-color: #535bf2;
+  border-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
+}
+
+.next-button {
+  background-color: rgba(100, 108, 255, 0.15);
+  color: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(100, 108, 255, 0.3);
+  cursor: not-allowed;
+}
+
+.next-button:disabled {
+  opacity: 0.6;
+}
+
+/* Light mode feedback styles */
+@media (prefers-color-scheme: light) {
+  .feedback-section {
+    border-top-color: rgba(83, 91, 242, 0.3);
+  }
+
+  .feedback-header h2 {
+    color: rgba(0, 0, 0, 0.95);
+  }
+
+  .feedback-subtitle {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .feedback-block {
+    background-color: rgba(83, 91, 242, 0.05);
+    border-color: rgba(83, 91, 242, 0.3);
+  }
+
+  .feedback-block:hover {
+    box-shadow: 0 4px 12px rgba(83, 91, 242, 0.2);
+  }
+
+  .feedback-block-header h3 {
+    color: rgba(0, 0, 0, 0.95);
+  }
+
+  .feedback-content p {
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .feedback-positive {
+    border-color: rgba(76, 175, 80, 0.6);
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(76, 175, 80, 0.05) 100%);
+  }
+
+  .feedback-positive:hover {
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+  }
+
+  .feedback-warning {
+    border-color: rgba(255, 193, 7, 0.6);
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.05) 100%);
+  }
+
+  .feedback-warning:hover {
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25);
+  }
+
+  .feedback-info {
+    border-color: rgba(33, 150, 243, 0.6);
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 150, 243, 0.05) 100%);
+  }
+
+  .feedback-info:hover {
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.25);
+  }
+
+  .feedback-suggestion {
+    border-color: rgba(156, 39, 176, 0.6);
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.15) 0%, rgba(156, 39, 176, 0.05) 100%);
+  }
+
+  .feedback-suggestion:hover {
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.25);
+  }
+
+  .retry-button {
+    background-color: #535bf2;
+    border-color: #535bf2;
+  }
+
+  .retry-button:hover {
+    background-color: #747bff;
+    border-color: #747bff;
+    box-shadow: 0 4px 12px rgba(83, 91, 242, 0.3);
+  }
+
+  .next-button {
+    background-color: rgba(83, 91, 242, 0.1);
+    color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(83, 91, 242, 0.3);
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .concept-assessment-view {
@@ -423,5 +666,9 @@
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
+  }
+
+  .feedback-actions {
+    flex-direction: column;
   }
 }
