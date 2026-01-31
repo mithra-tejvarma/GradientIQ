@@ -4,7 +4,7 @@ import './Page.css';
 function AssessmentPage() {
   // Behavior detection thresholds
   const INACTIVITY_THRESHOLD_SECONDS = 30;
-  const FAST_SUBMISSION_TIME_THRESHOLD = 10;
+  const FAST_SUBMISSION_TIME_THRESHOLD_SECONDS = 10;
   const MIN_ANSWER_LENGTH = 50;
   const SUBSTANTIAL_ANSWER_LENGTH = 100;
   const SMALL_CHANGE_THRESHOLD = 3;
@@ -108,6 +108,7 @@ function AssessmentPage() {
   const typingEvents = useRef([]);
   const lastActivityTime = useRef(null);
   const hasTypedIncrementally = useRef(false);
+  const hasPastedContent = useRef(false);
 
   // Initialize refs on mount
   useEffect(() => {
@@ -129,6 +130,7 @@ function AssessmentPage() {
     typingEvents.current = [];
     lastActivityTime.current = Date.now();
     hasTypedIncrementally.current = false;
+    hasPastedContent.current = false;
   }, [selectedConcept]);
 
   // Handle typing in the answer textarea
@@ -160,7 +162,7 @@ function AssessmentPage() {
     const changeSize = Math.abs(newText.length - answerText.length);
     if (changeSize > LARGE_PASTE_THRESHOLD && timeSinceLastActivity > PASTE_DETECTION_DELAY_MS) {
       // This looks like a paste rather than typing
-      hasTypedIncrementally.current = false;
+      hasPastedContent.current = true;
     }
     
     lastActivityTime.current = currentTime;
@@ -188,7 +190,7 @@ function AssessmentPage() {
     }
     
     // Pattern 2: Very fast full answer submission
-    if (timeSinceQuestionLoad < FAST_SUBMISSION_TIME_THRESHOLD && answerText.length > MIN_ANSWER_LENGTH) {
+    if (timeSinceQuestionLoad < FAST_SUBMISSION_TIME_THRESHOLD_SECONDS && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
       flags.push({
         type: 'fast-submission',
         message: 'Quick submission detected',
@@ -197,7 +199,7 @@ function AssessmentPage() {
     }
     
     // Pattern 3: No incremental typing (possible paste)
-    if (!hasTypedIncrementally.current && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
+    if (!hasTypedIncrementally.current && hasPastedContent.current && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
       flags.push({
         type: 'no-incremental',
         message: 'Review fundamentals recommended',
@@ -219,19 +221,19 @@ function AssessmentPage() {
     console.log('Save Progress clicked - logic to be implemented');
   };
 
+  const handleConceptChange = (concept) => {
+    setSelectedConcept(concept);
+    // Reset answer and behavior tracking when concept changes
+    setAnswerText('');
+    setBehaviorFlags([]);
+  };
+
   const handleSubjectChange = (subject) => {
     setSelectedSubject(subject);
     // Set first concept of the new subject as selected
     const firstConcept = subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
     // Reset answer and behavior tracking when subject changes
-    setAnswerText('');
-    setBehaviorFlags([]);
-  };
-
-  const handleConceptChange = (concept) => {
-    setSelectedConcept(concept);
-    // Reset answer and behavior tracking when concept changes
     setAnswerText('');
     setBehaviorFlags([]);
   };
