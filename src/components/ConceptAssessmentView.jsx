@@ -93,6 +93,7 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       clearTimeout(inactivityTimeoutRef.current);
     }
     inactivityTimeoutRef.current = setTimeout(() => {
+      // Mock condition: Show feedback after prolonged inactivity
       console.log('User stopped progressing - showing feedback (mock condition)');
       setShowFeedback(true);
     }, INACTIVITY_THRESHOLD_MS);
@@ -310,6 +311,7 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
           {/* Action Buttons */}
           <div className="feedback-actions">
             <button className="retry-button">Retry Concept</button>
+            {/* Note: Button handlers will be implemented in future iterations */}
             <button className="next-button" disabled>Move to Next Concept</button>
           </div>
         </div>
