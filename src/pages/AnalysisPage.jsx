@@ -1,4 +1,4 @@
-import './AnalysisPage.css';
+import './Page.css';
 
 function AnalysisPage() {
   return (

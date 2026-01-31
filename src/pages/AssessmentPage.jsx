@@ -1,4 +1,4 @@
-import './AssessmentPage.css';
+import './Page.css';
 
 function AssessmentPage() {
   return (
