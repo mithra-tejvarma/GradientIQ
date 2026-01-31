@@ -1,5 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Page.css';
+
+// Behavior detection thresholds
+const INACTIVITY_THRESHOLD_SECONDS = 30;
+const FAST_SUBMISSION_TIME_THRESHOLD_SECONDS = 10;
+const SUBSTANTIAL_ANSWER_LENGTH = 100;
+const SMALL_CHANGE_THRESHOLD = 3;
+const FREQUENT_TYPING_WINDOW_MS = 5000;
+const LARGE_PASTE_THRESHOLD = 50;
+const PASTE_DETECTION_DELAY_MS = 500;
+const MAX_TYPING_EVENTS = 100; // Limit array size to prevent memory issues
 
 function AssessmentPage() {
   // Mock data structure for subjects and concepts
@@ -90,18 +100,21 @@ function AssessmentPage() {
   // State management
   const [selectedSubject, setSelectedSubject] = useState('Coding');
   const [selectedConcept, setSelectedConcept] = useState('Loops');
-  const [answer, setAnswer] = useState('');
-  const [feedback, setFeedback] = useState(null);
-  const [conceptScores, setConceptScores] = useState({});
-  const [unlockedConcepts, setUnlockedConcepts] = useState({
-    'Coding': ['Loops'],
-    'Physics': ['Kinematics'],
-    'Chemistry': ['Atomic Structure'],
-    'Mathematics': ['Algebra'],
-    'Social Studies': ['World History'],
-    'Cryptography': ['Hashing'],
-    'Biology': ['Cell Biology']
-  });
+  const [answerText, setAnswerText] = useState('');
+  const [behaviorFlags, setBehaviorFlags] = useState([]);
+  
+  // Behavior tracking refs
+  const questionLoadTime = useRef(null);
+  const typingEvents = useRef([]);
+  const lastActivityTime = useRef(null);
+  const hasTypedIncrementally = useRef(false);
+  const hasPastedContent = useRef(false);
+
+  // Initialize refs on mount
+  useEffect(() => {
+    questionLoadTime.current = Date.now();
+    lastActivityTime.current = Date.now();
+  }, []);
 
   // Get current question based on selected concept
   const currentQuestion = mockQuestions[selectedConcept] || {
@@ -109,145 +122,105 @@ function AssessmentPage() {
     questionText: 'Question not available.'
   };
 
-  // Mock NLP and behavior analysis
-  const analyzeAnswer = (answerText) => {
-    // Mock analysis based on answer length and keywords
-    const words = answerText.trim().split(/\s+/).filter(w => w.length > 0);
-    const answerLength = words.length;
-    const hasCode = /function|for|while|if|return|const|let|var/.test(answerText);
-    const hasMath = /\d+|equation|formula|calculate/.test(answerText);
-    const hasExplanation = answerLength > 20;
+  // Reset behavior tracking when question changes
+  useEffect(() => {
+    questionLoadTime.current = Date.now();
+    typingEvents.current = [];
+    lastActivityTime.current = Date.now();
+    hasTypedIncrementally.current = false;
+    hasPastedContent.current = false;
+  }, [selectedConcept]);
+
+  // Handle typing in the answer textarea
+  const handleAnswerChange = (e) => {
+    const newText = e.target.value;
+    const currentTime = Date.now();
+    const timeSinceLastActivity = currentTime - lastActivityTime.current;
     
-    // Determine if answer seems incomplete (behavior pattern)
-    const isIncomplete = answerLength < 10 || (!hasCode && !hasMath && !hasExplanation);
+    // Track typing event with size limit to prevent memory issues
+    typingEvents.current.push({
+      timestamp: currentTime,
+      textLength: newText.length,
+      changeSize: Math.abs(newText.length - answerText.length)
+    });
     
-    // Calculate quality score (mock NLP signal)
-    let qualityScore = 0;
-    if (answerLength >= 10) qualityScore += 30;
-    if (answerLength >= 30) qualityScore += 20;
-    if (hasCode || hasMath) qualityScore += 30;
-    if (hasExplanation) qualityScore += 20;
+    // Keep only the most recent events
+    if (typingEvents.current.length > MAX_TYPING_EVENTS) {
+      typingEvents.current = typingEvents.current.slice(-MAX_TYPING_EVENTS);
+    }
     
-    // Determine performance level
-    let performanceLevel = 'poor';
-    if (qualityScore >= 70) performanceLevel = 'excellent';
-    else if (qualityScore >= 50) performanceLevel = 'good';
-    else if (qualityScore >= 30) performanceLevel = 'fair';
+    // Detect incremental typing (small changes, frequent updates)
+    if (typingEvents.current.length > 1) {
+      const recentEvents = typingEvents.current.slice(-5);
+      // Ensure we have enough events to analyze
+      if (recentEvents.length >= 3) {
+        const hasSmallChanges = recentEvents.every(event => event.changeSize <= SMALL_CHANGE_THRESHOLD);
+        const hasFrequentUpdates = 
+          (recentEvents[recentEvents.length - 1].timestamp - recentEvents[0].timestamp) < FREQUENT_TYPING_WINDOW_MS;
+        
+        if (hasSmallChanges && hasFrequentUpdates) {
+          hasTypedIncrementally.current = true;
+        }
+      }
+    }
     
-    return {
-      qualityScore,
-      performanceLevel,
-      isIncomplete,
-      answerLength,
-      hasCode,
-      hasMath,
-      hasExplanation
-    };
+    // Detect large paste (sudden large text addition)
+    const changeSize = Math.abs(newText.length - answerText.length);
+    if (changeSize > LARGE_PASTE_THRESHOLD && timeSinceLastActivity > PASTE_DETECTION_DELAY_MS) {
+      // This looks like a paste rather than typing
+      hasPastedContent.current = true;
+    }
+    
+    lastActivityTime.current = currentTime;
+    setAnswerText(newText);
   };
 
-  // Generate feedback based on analysis
-  const generateFeedback = (analysis, concept, difficulty) => {
-    const feedback = {
-      understood: [],
-      reasoningIssues: [],
-      nextSteps: [],
-      capabilityScore: analysis.qualityScore,
-      shouldReinforce: false,
-      shouldUnlock: false
-    };
-
-    // What was understood
-    if (analysis.hasCode) {
-      feedback.understood.push('You demonstrated coding ability');
+  // Analyze behavior patterns
+  const analyzeBehaviorPatterns = () => {
+    const flags = [];
+    const currentTime = Date.now();
+    const timeSinceQuestionLoad = (currentTime - questionLoadTime.current) / 1000; // in seconds
+    
+    // Pattern 1: Long inactivity pause after question load
+    if (typingEvents.current.length > 0) {
+      const firstTypingTime = typingEvents.current[0].timestamp;
+      const inactivityBeforeTyping = (firstTypingTime - questionLoadTime.current) / 1000;
+      
+      if (inactivityBeforeTyping > INACTIVITY_THRESHOLD_SECONDS) {
+        flags.push({
+          type: 'inactivity',
+          message: 'Possible lack of clarity',
+          details: 'We noticed a pause before starting. If the question was unclear, feel free to ask for clarification or review the concept materials.'
+        });
+      }
     }
-    if (analysis.hasMath) {
-      feedback.understood.push('You showed understanding of mathematical concepts');
+    
+    // Pattern 2: Very fast full answer submission
+    if (timeSinceQuestionLoad < FAST_SUBMISSION_TIME_THRESHOLD_SECONDS && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
+      flags.push({
+        type: 'fast-submission',
+        message: 'Quick submission detected',
+        details: 'You submitted quickly! Take your time to review your answer and ensure you\'ve covered all aspects of the question.'
+      });
     }
-    if (analysis.hasExplanation) {
-      feedback.understood.push('You provided detailed explanations');
+    
+    // Pattern 3: No incremental typing (possible paste)
+    if (!hasTypedIncrementally.current && hasPastedContent.current && answerText.length > SUBSTANTIAL_ANSWER_LENGTH) {
+      flags.push({
+        type: 'no-incremental',
+        message: 'Review fundamentals recommended',
+        details: 'Your answer appears complete. Consider reviewing the fundamental concepts to strengthen your understanding and build confidence.'
+      });
     }
-    if (analysis.answerLength >= 30) {
-      feedback.understood.push('You gave a thorough response');
-    }
-
-    // Where reasoning broke
-    if (analysis.isIncomplete) {
-      feedback.reasoningIssues.push('Your answer appears incomplete - consider elaborating more');
-      feedback.shouldReinforce = true;
-    }
-    if (analysis.answerLength < 10) {
-      feedback.reasoningIssues.push('Response is too brief to assess understanding');
-      feedback.shouldReinforce = true;
-    }
-    if (!analysis.hasCode && difficulty === 'Hard' && concept === 'Recursion') {
-      feedback.reasoningIssues.push('Missing code implementation for this concept');
-    }
-    if (!analysis.hasExplanation && difficulty !== 'Easy') {
-      feedback.reasoningIssues.push('Consider adding more explanation to demonstrate understanding');
-    }
-
-    // What to study next
-    if (analysis.performanceLevel === 'excellent') {
-      feedback.nextSteps.push('Great work! You\'re ready for more challenging concepts');
-      feedback.shouldUnlock = true;
-    } else if (analysis.performanceLevel === 'good') {
-      feedback.nextSteps.push('Good progress! Review the key concepts and try advanced problems');
-    } else if (analysis.isIncomplete) {
-      feedback.nextSteps.push('Review the basic concepts before moving forward');
-      feedback.nextSteps.push(`Focus on understanding the fundamentals of ${concept}`);
-    } else {
-      feedback.nextSteps.push(`Practice more problems related to ${concept}`);
-    }
-
-    // Add specific recommendations based on concept
-    if (concept === 'Loops') {
-      feedback.nextSteps.push('Try implementing different loop types (for, while, do-while)');
-    } else if (concept === 'Recursion') {
-      feedback.nextSteps.push('Practice base cases and recursive calls');
-    }
-
-    return feedback;
+    
+    return flags;
   };
 
   // Placeholder handlers
   const handleSubmit = () => {
-    if (!answer.trim()) {
-      setFeedback({
-        understood: [],
-        reasoningIssues: ['No answer provided'],
-        nextSteps: ['Please write your answer before submitting'],
-        capabilityScore: 0,
-        shouldReinforce: true,
-        shouldUnlock: false
-      });
-      return;
-    }
-
-    // Analyze the answer
-    const analysis = analyzeAnswer(answer);
-    const generatedFeedback = generateFeedback(analysis, selectedConcept, currentQuestion.difficulty);
-    
-    // Update concept score
-    setConceptScores(prev => ({
-      ...prev,
-      [selectedConcept]: generatedFeedback.capabilityScore
-    }));
-
-    // Handle unlocking based on performance
-    if (generatedFeedback.shouldUnlock) {
-      const subjectConcepts = subjects[selectedSubject].concepts;
-      const currentIndex = subjectConcepts.indexOf(selectedConcept);
-      if (currentIndex < subjectConcepts.length - 1) {
-        const nextConcept = subjectConcepts[currentIndex + 1];
-        setUnlockedConcepts(prev => ({
-          ...prev,
-          [selectedSubject]: [...(prev[selectedSubject] || []), nextConcept]
-        }));
-        generatedFeedback.nextSteps.push(`🎉 Unlocked next concept: ${nextConcept}!`);
-      }
-    }
-
-    setFeedback(generatedFeedback);
+    const detectedFlags = analyzeBehaviorPatterns();
+    setBehaviorFlags(detectedFlags);
+    console.log('Submit clicked - behavior flags:', detectedFlags);
   };
 
   const handleSaveProgress = () => {
@@ -260,20 +233,22 @@ function AssessmentPage() {
     alert('Progress saved successfully!');
   };
 
+  const handleConceptChange = (concept) => {
+    setSelectedConcept(concept);
+    // Reset answer and behavior tracking when concept changes
+    setAnswerText('');
+    setBehaviorFlags([]);
+  };
+
   const handleSubjectChange = (subject) => {
     setSelectedSubject(subject);
     // Set first unlocked concept of the new subject as selected
     const unlockedForSubject = unlockedConcepts[subject] || [];
     const firstConcept = unlockedForSubject[0] || subjects[subject].concepts[0];
     setSelectedConcept(firstConcept);
-    setAnswer('');
-    setFeedback(null);
-  };
-
-  const handleConceptChange = (concept) => {
-    setSelectedConcept(concept);
-    setAnswer('');
-    setFeedback(null);
+    // Reset answer and behavior tracking when subject changes
+    setAnswerText('');
+    setBehaviorFlags([]);
   };
 
   return (
@@ -346,8 +321,8 @@ function AssessmentPage() {
           className="answer-input"
           placeholder="Type your answer here... You can write explanations, steps, or code."
           rows="10"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
+          value={answerText}
+          onChange={handleAnswerChange}
         />
       </section>
 
@@ -366,84 +341,18 @@ function AssessmentPage() {
       {/* Feedback Section */}
       <section className="assessment-section">
         <h2>Feedback</h2>
-        {!feedback ? (
-          <div className="placeholder-content">
-            <p>Feedback will appear here showing where you are strong or stuck.</p>
+        {behaviorFlags.length > 0 ? (
+          <div className="behavior-feedback">
+            {behaviorFlags.map((flag, index) => (
+              <div key={index} className="feedback-card">
+                <h3 className="feedback-title">💡 {flag.message}</h3>
+                <p className="feedback-details">{flag.details}</p>
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="feedback-content">
-            {/* Capability Score */}
-            <div className="feedback-score">
-              <h3>Concept Capability Score: {feedback.capabilityScore}%</h3>
-              <div className="score-bar">
-                <div 
-                  className="score-fill" 
-                  style={{ width: `${feedback.capabilityScore}%` }}
-                />
-              </div>
-            </div>
-
-            {/* What was understood */}
-            <div className="feedback-section-box">
-              <h3>✅ What Was Understood</h3>
-              {feedback.understood.length > 0 ? (
-                <ul>
-                  {feedback.understood.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="feedback-empty">No clear understanding demonstrated yet.</p>
-              )}
-            </div>
-
-            {/* Where reasoning broke */}
-            {feedback.reasoningIssues.length > 0 && (
-              <div className="feedback-section-box warning">
-                <h3>⚠️ Where Reasoning Broke</h3>
-                <ul>
-                  {feedback.reasoningIssues.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-                {feedback.shouldReinforce && (
-                  <div className="reinforcement-alert">
-                    <strong>📚 Reinforcement Needed:</strong> Review basic concepts before continuing.
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* What to study next */}
-            <div className="feedback-section-box success">
-              <h3>📖 What to Study Next</h3>
-              <ul>
-                {feedback.nextSteps.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Topic Strength/Weakness Summary */}
-            <div className="feedback-section-box">
-              <h3>📊 Topic Strength Assessment</h3>
-              {feedback.capabilityScore >= 70 ? (
-                <p className="strength-indicator strong">
-                  <strong>Strong:</strong> You have a good grasp of {selectedConcept}. 
-                  {feedback.shouldUnlock && ' Ready for more advanced concepts!'}
-                </p>
-              ) : feedback.capabilityScore >= 40 ? (
-                <p className="strength-indicator moderate">
-                  <strong>Moderate:</strong> You understand some aspects of {selectedConcept}, 
-                  but need more practice.
-                </p>
-              ) : (
-                <p className="strength-indicator weak">
-                  <strong>Weak:</strong> {selectedConcept} needs more attention. 
-                  Review the fundamentals and practice basic problems.
-                </p>
-              )}
-            </div>
+          <div className="placeholder-content">
+            <p>Feedback will appear here showing where you are strong or stuck.</p>
           </div>
         )}
       </section>
