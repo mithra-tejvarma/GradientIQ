@@ -3,6 +3,7 @@ import './ConceptAssessmentView.css';
 
 // Constants
 const PAUSE_THRESHOLD_MS = 2000; // Time threshold for detecting a pause (in milliseconds)
+const INACTIVITY_THRESHOLD_MS = 30000; // 30 seconds of inactivity to trigger feedback (mock condition)
 
 function ConceptAssessmentView({ subject, concept, question, onBack }) {
   // Answer state
@@ -14,11 +15,15 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
   const [pauseLog, setPauseLog] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   
+  // Feedback state
+  const [showFeedback, setShowFeedback] = useState(false);
+  
   // Refs
   const startTimeRef = useRef(null);
   const lastKeystrokeRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const timerIntervalRef = useRef(null);
+  const inactivityTimeoutRef = useRef(null);
   
   // Start timer on component mount
   useEffect(() => {
@@ -31,6 +36,12 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       setTimeSpent(elapsed);
     }, 1000);
     
+    // Set inactivity timeout to show feedback after prolonged inactivity (mock condition)
+    const inactivityTimeout = setTimeout(() => {
+      setShowFeedback(true);
+    }, INACTIVITY_THRESHOLD_MS);
+    inactivityTimeoutRef.current = inactivityTimeout;
+    
     // Cleanup on unmount
     return () => {
       if (timerIntervalRef.current) {
@@ -38,6 +49,9 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       }
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
+      }
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
       }
     };
   }, []);
@@ -74,6 +88,16 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
       clearTimeout(typingTimeoutRef.current);
     }
     
+    // Reset inactivity timeout on any keystroke
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
+    inactivityTimeoutRef.current = setTimeout(() => {
+      // Mock condition: Show feedback after prolonged inactivity
+      console.log('User stopped progressing - showing feedback (mock condition)');
+      setShowFeedback(true);
+    }, INACTIVITY_THRESHOLD_MS);
+    
     // Set typing to false after threshold of inactivity
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
@@ -107,7 +131,8 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
         : 0
     });
     
-    alert('Answer submitted! Check console for tracking details.');
+    // Show feedback after submission
+    setShowFeedback(true);
   };
   
   // Handle save progress
@@ -224,6 +249,73 @@ function ConceptAssessmentView({ subject, concept, question, onBack }) {
           </div>
         </details>
       </div>
+
+      {/* Feedback Section */}
+      {showFeedback && (
+        <div className="feedback-section">
+          <div className="feedback-header">
+            <h2>Assessment Feedback</h2>
+            <p className="feedback-subtitle">Understanding-based evaluation</p>
+          </div>
+
+          <div className="feedback-container">
+            {/* What You Did Well */}
+            <div className="feedback-block feedback-positive">
+              <div className="feedback-block-header">
+                <span className="feedback-icon">✔</span>
+                <h3>What You Did Well</h3>
+              </div>
+              <div className="feedback-content">
+                <p>Correct understanding of the core concept</p>
+                <p>Logical approach in initial steps</p>
+              </div>
+            </div>
+
+            {/* Where You Got Stuck */}
+            <div className="feedback-block feedback-warning">
+              <div className="feedback-block-header">
+                <span className="feedback-icon">⚠</span>
+                <h3>Where You Got Stuck</h3>
+              </div>
+              <div className="feedback-content">
+                <p>Difficulty applying the concept in later steps</p>
+                <p>Incomplete reasoning beyond step 2</p>
+              </div>
+            </div>
+
+            {/* Concept Gap Identified */}
+            <div className="feedback-block feedback-info">
+              <div className="feedback-block-header">
+                <span className="feedback-icon">🧠</span>
+                <h3>Concept Gap Identified</h3>
+              </div>
+              <div className="feedback-content">
+                <p>Weak understanding of fundamentals</p>
+                <p>Needs revision of base formula / definition</p>
+              </div>
+            </div>
+
+            {/* What To Learn Next */}
+            <div className="feedback-block feedback-suggestion">
+              <div className="feedback-block-header">
+                <span className="feedback-icon">📘</span>
+                <h3>What To Learn Next</h3>
+              </div>
+              <div className="feedback-content">
+                <p>Revise basic concepts</p>
+                <p>Practice simpler problems before advancing</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="feedback-actions">
+            <button className="retry-button">Retry Concept</button>
+            {/* Note: Button handlers will be implemented in future iterations */}
+            <button className="next-button" disabled>Move to Next Concept</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
