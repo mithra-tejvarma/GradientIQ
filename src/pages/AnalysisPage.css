@@ -1,0 +1,240 @@
+/* Analysis Page Specific Styles */
+
+.analysis-section {
+  margin-bottom: 3rem;
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Analysis Wheel Styles */
+.analysis-wheel-container {
+  background-color: rgba(100, 108, 255, 0.05);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.analysis-wheel-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.wheel-center {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(100, 108, 255, 0.2), rgba(100, 108, 255, 0.1));
+  border: 3px solid rgba(100, 108, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.wheel-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.metrics-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgba(100, 108, 255, 0.08);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.metric-item:hover {
+  background-color: rgba(100, 108, 255, 0.12);
+  border-color: rgba(100, 108, 255, 0.3);
+}
+
+.metric-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #646cff;
+}
+
+.wheel-description {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Leaderboard Styles */
+.leaderboard-container {
+  background-color: rgba(100, 108, 255, 0.05);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.leaderboard-table thead {
+  border-bottom: 2px solid rgba(100, 108, 255, 0.3);
+}
+
+.leaderboard-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.leaderboard-table tbody tr {
+  border-bottom: 1px solid rgba(100, 108, 255, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.leaderboard-table tbody tr:hover {
+  background-color: rgba(100, 108, 255, 0.08);
+}
+
+.leaderboard-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-table tbody tr.current-user {
+  background-color: rgba(100, 108, 255, 0.15);
+  font-weight: 600;
+}
+
+.leaderboard-table tbody tr.current-user:hover {
+  background-color: rgba(100, 108, 255, 0.2);
+}
+
+.leaderboard-table td {
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.rank-cell {
+  font-weight: 700;
+  color: #646cff;
+  font-size: 1.1rem;
+}
+
+.name-cell {
+  font-size: 1rem;
+}
+
+.score-cell {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Light mode styles */
+@media (prefers-color-scheme: light) {
+  .section-heading {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .analysis-wheel-container,
+  .leaderboard-container {
+    background-color: rgba(83, 91, 242, 0.05);
+    border: 1px solid rgba(83, 91, 242, 0.2);
+  }
+
+  .wheel-center {
+    background: linear-gradient(135deg, rgba(83, 91, 242, 0.2), rgba(83, 91, 242, 0.1));
+    border: 3px solid rgba(83, 91, 242, 0.4);
+  }
+
+  .metric-item {
+    background-color: rgba(83, 91, 242, 0.08);
+    border: 1px solid rgba(83, 91, 242, 0.2);
+  }
+
+  .metric-item:hover {
+    background-color: rgba(83, 91, 242, 0.12);
+    border-color: rgba(83, 91, 242, 0.3);
+  }
+
+  .metric-name {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .metric-value {
+    color: #535bf2;
+  }
+
+  .wheel-description {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .leaderboard-table th {
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .leaderboard-table tbody tr {
+    border-bottom: 1px solid rgba(83, 91, 242, 0.1);
+  }
+
+  .leaderboard-table tbody tr:hover {
+    background-color: rgba(83, 91, 242, 0.08);
+  }
+
+  .leaderboard-table tbody tr.current-user {
+    background-color: rgba(83, 91, 242, 0.15);
+  }
+
+  .leaderboard-table tbody tr.current-user:hover {
+    background-color: rgba(83, 91, 242, 0.2);
+  }
+
+  .leaderboard-table td {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .rank-cell {
+    color: #535bf2;
+  }
+}
