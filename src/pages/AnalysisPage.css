@@ -28,6 +28,115 @@
   min-height: 500px;
 }
 
+/* Star Map Styles */
+.star-map-container {
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-map {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-map-inner {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.axis {
+  position: absolute;
+  width: 2px;
+  height: 50%;
+  background: rgba(100, 108, 255, 0.3);
+  left: 50%;
+  top: 0;
+  transform-origin: bottom center;
+}
+
+.axis-1 {
+  transform: translateX(-50%) rotate(0deg);
+}
+
+.axis-2 {
+  transform: translateX(-50%) rotate(72deg);
+}
+
+.axis-3 {
+  transform: translateX(-50%) rotate(144deg);
+}
+
+.axis-4 {
+  transform: translateX(-50%) rotate(216deg);
+}
+
+.axis-5 {
+  transform: translateX(-50%) rotate(288deg);
+}
+
+.star-polygon {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(100, 108, 255, 0.2);
+  clip-path: polygon(
+    50% 10%,
+    68% 38%,
+    82% 50%,
+    68% 75%,
+    32% 75%,
+    18% 50%,
+    32% 38%
+  );
+  border: 2px solid rgba(100, 108, 255, 1);
+}
+
+.star-label {
+  position: absolute;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.label-1 {
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.label-2 {
+  top: 15%;
+  right: -25%;
+}
+
+.label-3 {
+  bottom: 15%;
+  right: -22%;
+}
+
+.label-4 {
+  bottom: 15%;
+  left: -22%;
+}
+
+.label-5 {
+  top: 15%;
+  left: -25%;
+}
+
 .analysis-wheel-placeholder {
   display: flex;
   flex-direction: column;
@@ -216,6 +325,11 @@
 
   .wheel-description {
     color: rgba(0, 0, 0, 0.6);
+  }
+
+  /* Star map light mode */
+  .star-label {
+    color: rgba(0, 0, 0, 0.9);
   }
 
   .leaderboard-table th {
