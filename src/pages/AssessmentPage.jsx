@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import './Page.css';
 
+// Behavior detection thresholds
+const INACTIVITY_THRESHOLD_SECONDS = 30;
+const FAST_SUBMISSION_TIME_THRESHOLD_SECONDS = 10;
+const SUBSTANTIAL_ANSWER_LENGTH = 100;
+const SMALL_CHANGE_THRESHOLD = 3;
+const FREQUENT_TYPING_WINDOW_MS = 5000;
+const LARGE_PASTE_THRESHOLD = 50;
+const PASTE_DETECTION_DELAY_MS = 500;
+const MAX_TYPING_EVENTS = 100; // Limit array size to prevent memory issues
+
 function AssessmentPage() {
-  // Behavior detection thresholds
-  const INACTIVITY_THRESHOLD_SECONDS = 30;
-  const FAST_SUBMISSION_TIME_THRESHOLD_SECONDS = 10;
-  const MIN_ANSWER_LENGTH = 50;
-  const SUBSTANTIAL_ANSWER_LENGTH = 100;
-  const SMALL_CHANGE_THRESHOLD = 3;
-  const FREQUENT_TYPING_WINDOW_MS = 5000;
-  const LARGE_PASTE_THRESHOLD = 50;
-  const PASTE_DETECTION_DELAY_MS = 500;
 
   // Mock data structure for subjects and concepts
   const subjects = {
@@ -112,10 +113,8 @@ function AssessmentPage() {
 
   // Initialize refs on mount
   useEffect(() => {
-    if (questionLoadTime.current === null) {
-      questionLoadTime.current = Date.now();
-      lastActivityTime.current = Date.now();
-    }
+    questionLoadTime.current = Date.now();
+    lastActivityTime.current = Date.now();
   }, []);
 
   // Get current question based on selected concept
@@ -139,12 +138,17 @@ function AssessmentPage() {
     const currentTime = Date.now();
     const timeSinceLastActivity = currentTime - lastActivityTime.current;
     
-    // Track typing event
+    // Track typing event with size limit to prevent memory issues
     typingEvents.current.push({
       timestamp: currentTime,
       textLength: newText.length,
       changeSize: Math.abs(newText.length - answerText.length)
     });
+    
+    // Keep only the most recent events
+    if (typingEvents.current.length > MAX_TYPING_EVENTS) {
+      typingEvents.current = typingEvents.current.slice(-MAX_TYPING_EVENTS);
+    }
     
     // Detect incremental typing (small changes, frequent updates)
     if (typingEvents.current.length > 1) {
