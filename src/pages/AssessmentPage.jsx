@@ -179,7 +179,7 @@ function AssessmentPage() {
       feedback.reasoningIssues.push('Response is too brief to assess understanding');
       feedback.shouldReinforce = true;
     }
-    if (!analysis.hasCode && difficulty === 'Hard' && concept.includes('Recursion')) {
+    if (!analysis.hasCode && difficulty === 'Hard' && concept === 'Recursion') {
       feedback.reasoningIssues.push('Missing code implementation for this concept');
     }
     if (!analysis.hasExplanation && difficulty !== 'Easy') {
@@ -192,7 +192,7 @@ function AssessmentPage() {
       feedback.shouldUnlock = true;
     } else if (analysis.performanceLevel === 'good') {
       feedback.nextSteps.push('Good progress! Review the key concepts and try advanced problems');
-    } else if (analysis.shouldReinforce) {
+    } else if (analysis.isIncomplete) {
       feedback.nextSteps.push('Review the basic concepts before moving forward');
       feedback.nextSteps.push(`Focus on understanding the fundamentals of ${concept}`);
     } else {
@@ -254,8 +254,8 @@ function AssessmentPage() {
     console.log('Progress saved:', {
       subject: selectedSubject,
       concept: selectedConcept,
-      answer: answer,
-      conceptScores: conceptScores
+      answer,
+      conceptScores
     });
     alert('Progress saved successfully!');
   };
