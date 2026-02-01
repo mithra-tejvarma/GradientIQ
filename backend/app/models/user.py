@@ -20,6 +20,7 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     role = Column(Enum(UserRole), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    hashed_password = Column(String, nullable=True)
 
     # Relationships
     assessment_attempts = relationship("AssessmentAttempt", back_populates="user")

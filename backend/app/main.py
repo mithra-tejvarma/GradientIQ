@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine
 from app.db.base import Base
 from app.routes import students_router, subjects_router, topics_router, assessment_router, feedback_router, capability_router, faculty_router
+from app.auth import auth_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(students_router, prefix="/students", tags=["students"])
 app.include_router(subjects_router, prefix="/subjects", tags=["subjects"])
 app.include_router(topics_router, prefix="/topics", tags=["topics"])
