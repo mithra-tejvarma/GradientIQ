@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Backend base URL for internal services
+# This ensures all internal services communicate with the deployed backend
+BASE_BACKEND_URL = "https://gradientiq-backend.onrender.com"
+
 # Database configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./gradientiq.db")
 
