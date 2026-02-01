@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
 import logging
@@ -11,7 +12,8 @@ logger = logging.getLogger(__name__)
 def health_check(db: Session = Depends(get_db)):
     status = {
         "status": "ok",
-        "database": "connected",
+        # Note: auth, assessment_engine, and nlp_layer are assumed ready
+        # Implement actual checks if needed for production monitoring
         "auth": "ready",
         "assessment_engine": "ready",
         "nlp_layer": "ready"
@@ -19,7 +21,7 @@ def health_check(db: Session = Depends(get_db)):
     
     try:
         # Test database connection
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         status["database"] = "connected"
     except Exception as e:
         logger.error(f"Database health check failed: {str(e)}")
