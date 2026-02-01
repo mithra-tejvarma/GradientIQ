@@ -6,6 +6,7 @@ from app.db.base import Base
 from app.routes import students_router, subjects_router, topics_router, assessment_router, feedback_router, capability_router, faculty_router
 from app.auth import auth_router
 from app.assessment import router as assessment_flow_router
+from app.nlp import nlp_router
 
 
 @asynccontextmanager
@@ -43,6 +44,7 @@ app.include_router(assessment_flow_router, prefix="/assessment", tags=["assessme
 app.include_router(feedback_router, prefix="/feedback", tags=["feedback"])
 app.include_router(capability_router, prefix="/capability", tags=["capability"])
 app.include_router(faculty_router, prefix="/faculty", tags=["faculty"])
+app.include_router(nlp_router, prefix="/nlp", tags=["nlp"])
 
 # Root endpoint
 @app.get("/")
