@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String
+import uuid
+from sqlalchemy import Column, String, Text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
@@ -6,8 +8,10 @@ from app.db.database import Base
 class Subject(Base):
     __tablename__ = "subjects"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String, nullable=False, unique=True)
+    description = Column(Text, nullable=True)
 
-    # Relationship with topics
+    # Relationships
     topics = relationship("Topic", back_populates="subject")
+    assessment_attempts = relationship("AssessmentAttempt", back_populates="subject")

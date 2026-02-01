@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+import uuid
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
@@ -6,11 +8,12 @@ from app.db.database import Base
 class Topic(Base):
     __tablename__ = "topics"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    subject_id = Column(UUID(as_uuid=True), ForeignKey("subjects.id"), nullable=False)
     name = Column(String, nullable=False)
-    subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
+    difficulty_range = Column(String, nullable=True)  # e.g., "easy", "medium", "hard" or range
 
-    # Relationship with subject
+    # Relationships
     subject = relationship("Subject", back_populates="topics")
-    # Relationship with capabilities
-    capabilities = relationship("Capability", back_populates="topic")
+    questions = relationship("Question", back_populates="topic")
+    capability_scores = relationship("CapabilityScore", back_populates="topic")
