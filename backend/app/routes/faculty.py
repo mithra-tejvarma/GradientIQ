@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from typing import List
 from app.dependencies import get_db
+from app.auth.dependencies import require_faculty
 from app.models.student import Student
 from app.models.capability import Capability
 from app.models.topic import Topic
 from app.models.assessment import Assessment
+from app.models.user import User
 from app.schemas.student import StudentSchema
 from app.schemas.faculty import WeakTopicSchema
 
@@ -14,14 +16,14 @@ router = APIRouter()
 
 
 @router.get("/students", response_model=List[StudentSchema])
-def list_all_students(db: Session = Depends(get_db)):
+def list_all_students(db: Session = Depends(get_db), current_user: User = Depends(require_faculty)):
     """List all students."""
     students = db.query(Student).all()
     return students
 
 
 @router.get("/student/{student_id}/weak-topics", response_model=List[WeakTopicSchema])
-def get_student_weak_topics(student_id: int, db: Session = Depends(get_db)):
+def get_student_weak_topics(student_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_faculty)):
     """
     Return topics where capability_score < 50.
     Include last assessment status for quick difficulty detection.
