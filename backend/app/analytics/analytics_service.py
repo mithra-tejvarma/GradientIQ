@@ -34,23 +34,29 @@ def get_faculty_overview(db: Session) -> FacultyOverviewResponse:
     avg_capability = db.query(func.avg(CapabilityScore.capability_level)).scalar() or 0.0
     
     # Most difficult topics (based on failure rate)
-    difficult_topics_query = db.query(
-        Topic.id,
-        Topic.name,
-        func.count(case((AnswerAttempt.is_correct == False, 1))).label('failures'),
-        func.count(AnswerAttempt.id).label('total_attempts')
-    ).join(
-        AnswerAttempt, AnswerAttempt.question_id.in_(
-            db.query(func.unnest(func.array_agg(Topic.id)))
-        ), isouter=True
-    ).group_by(Topic.id, Topic.name).having(
-        func.count(AnswerAttempt.id) > 0
-    ).all()
-    
+    # Simplified approach: iterate through topics and calculate failure rates
+    topics = db.query(Topic).all()
     difficult_topics = []
-    for topic in difficult_topics_query:
-        if topic.total_attempts > 0:
-            failure_rate = float(topic.failures) / float(topic.total_attempts)
+    
+    for topic in topics:
+        from app.models.question import Question
+        # Count total attempts for this topic
+        total_attempts = db.query(func.count(AnswerAttempt.id)).join(
+            Question, Question.id == AnswerAttempt.question_id
+        ).filter(
+            Question.topic_id == topic.id
+        ).scalar() or 0
+        
+        if total_attempts > 0:
+            # Count failures for this topic
+            failures = db.query(func.count(AnswerAttempt.id)).join(
+                Question, Question.id == AnswerAttempt.question_id
+            ).filter(
+                Question.topic_id == topic.id,
+                AnswerAttempt.is_correct == False
+            ).scalar() or 0
+            
+            failure_rate = float(failures) / float(total_attempts)
             difficult_topics.append(TopicDifficulty(
                 topic_id=topic.id,
                 topic_name=topic.name,
@@ -207,6 +213,8 @@ def get_student_detail(db: Session, student_id: UUID) -> StudentDetailResponse:
 def get_topics_heatmap(db: Session) -> TopicHeatmapResponse:
     """Generate topic heatmap with difficulty and intervention metrics."""
     
+    from app.models.question import Question
+    
     topics = db.query(Topic).all()
     heatmap_items = []
     
@@ -218,15 +226,15 @@ def get_topics_heatmap(db: Session) -> TopicHeatmapResponse:
         
         # Failure rate for this topic
         total_attempts = db.query(func.count(AnswerAttempt.id)).join(
-            AnswerAttempt.question
+            Question, Question.id == AnswerAttempt.question_id
         ).filter(
-            AnswerAttempt.question.has(topic_id=topic.id)
+            Question.topic_id == topic.id
         ).scalar() or 0
         
         failed_attempts = db.query(func.count(AnswerAttempt.id)).join(
-            AnswerAttempt.question
+            Question, Question.id == AnswerAttempt.question_id
         ).filter(
-            AnswerAttempt.question.has(topic_id=topic.id),
+            Question.topic_id == topic.id,
             AnswerAttempt.is_correct == False
         ).scalar() or 0
         
@@ -239,9 +247,9 @@ def get_topics_heatmap(db: Session) -> TopicHeatmapResponse:
         ).join(
             AnswerAttempt, AnswerAttempt.id == Feedback.answer_attempt_id
         ).join(
-            AnswerAttempt.question
+            Question, Question.id == AnswerAttempt.question_id
         ).filter(
-            AnswerAttempt.question.has(topic_id=topic.id),
+            Question.topic_id == topic.id,
             Feedback.gap_type.isnot(None)
         ).group_by(Feedback.gap_type).order_by(desc('count')).first()
         
@@ -329,24 +337,26 @@ def get_student_self_insights(db: Session, student_id: UUID) -> StudentSelfInsig
     
     # Learning wheel metrics (5 dimensions)
     
+    from app.models.question import Question
+    
     # 1. IQ (reasoning quality) - based on correct answers to difficult questions
     correct_difficult = db.query(func.count(AnswerAttempt.id)).join(
         AssessmentAttempt, AssessmentAttempt.id == AnswerAttempt.assessment_id
     ).join(
-        AnswerAttempt.question
+        Question, Question.id == AnswerAttempt.question_id
     ).filter(
         AssessmentAttempt.user_id == student_id,
         AnswerAttempt.is_correct == True,
-        AnswerAttempt.question.has(difficulty_level >= 7)
+        Question.difficulty_level >= 7
     ).scalar() or 0
     
     total_difficult = db.query(func.count(AnswerAttempt.id)).join(
         AssessmentAttempt, AssessmentAttempt.id == AnswerAttempt.assessment_id
     ).join(
-        AnswerAttempt.question
+        Question, Question.id == AnswerAttempt.question_id
     ).filter(
         AssessmentAttempt.user_id == student_id,
-        AnswerAttempt.question.has(difficulty_level >= 7)
+        Question.difficulty_level >= 7
     ).scalar() or 1
     
     iq_score = float(correct_difficult) / float(total_difficult) * 100
