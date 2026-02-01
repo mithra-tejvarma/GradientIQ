@@ -120,7 +120,7 @@ def select_next_question(
     if is_partial or (progress_percentage is not None and progress_percentage < 70):
         next_question = db.query(Question).filter(
             Question.topic_id == current_topic_id,
-            ~Question.id.in_(answered_ids) if answered_ids else True
+            ~Question.id.in_(answered_ids or [])
         ).first()
         
         if next_question:
@@ -146,7 +146,7 @@ def select_next_question(
     # Get first unanswered question from next topic
     next_question = db.query(Question).filter(
         Question.topic_id == next_topic.id,
-        ~Question.id.in_(answered_ids) if answered_ids else True
+        ~Question.id.in_(answered_ids or [])
     ).first()
     
     return next_question
@@ -166,31 +166,10 @@ def get_assessment_status(db: Session, assessment_id: UUID) -> Optional[dict]:
         AnswerAttempt.assessment_id == assessment_id
     ).count()
     
-    # Get last answered question to determine next
-    last_answer = db.query(AnswerAttempt).filter(
-        AnswerAttempt.assessment_id == assessment_id
-    ).order_by(AnswerAttempt.id.desc()).first()
-    
-    next_question = None
-    if last_answer:
-        last_question = db.query(Question).filter(
-            Question.id == last_answer.question_id
-        ).first()
-        
-        if last_question:
-            next_question = select_next_question(
-                db,
-                assessment_id,
-                last_question.topic_id,
-                last_answer.progress_percentage,
-                (last_answer.progress_percentage is not None and last_answer.progress_percentage < 40) or
-                (last_answer.stopped_at_step is not None)
-            )
-    
     return {
         "assessment": assessment,
         "questions_attempted": questions_attempted,
-        "next_question": next_question
+        "next_question": None
     }
 
 

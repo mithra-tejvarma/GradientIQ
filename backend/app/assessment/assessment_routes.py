@@ -136,12 +136,6 @@ def get_assessment_status(
             detail="Assessment not found"
         )
     
-    next_question_response = None
-    if status_data["next_question"]:
-        next_question_response = assessment_service.format_question_response(
-            status_data["next_question"], db
-        )
-    
     return AssessmentStatusResponse(
         assessment_id=status_data["assessment"].id,
         subject_id=status_data["assessment"].subject_id,
@@ -150,5 +144,5 @@ def get_assessment_status(
         completed_at=status_data["assessment"].completed_at,
         questions_attempted=status_data["questions_attempted"],
         current_question=None,
-        next_question=next_question_response
+        next_question=None
     )
