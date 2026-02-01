@@ -168,6 +168,11 @@ export async function apiDelete(endpoint, options = {}) {
       throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
     }
 
+    // Handle 204 No Content response
+    if (response.status === 204) {
+      return null;
+    }
+
     return await response.json();
   } catch (error) {
     console.error('API DELETE Error:', error);

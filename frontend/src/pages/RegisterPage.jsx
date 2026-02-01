@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/auth';
 import './Page.css';
 
@@ -29,8 +29,10 @@ function RegisterPage() {
 
     try {
       await register(formData);
-      alert('Registration successful! Please login.');
-      navigate('/login');
+      // Show success state and redirect
+      navigate('/login', { 
+        state: { message: 'Registration successful! Please login.' }
+      });
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -216,18 +218,16 @@ function RegisterPage() {
           color: '#666'
         }}>
           Already have an account?{' '}
-          <a 
-            href="/login" 
+          <Link 
+            to="/login" 
             style={{ 
               color: '#667eea', 
               textDecoration: 'none',
               fontWeight: '600'
             }}
-            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
           >
             Login here
-          </a>
+          </Link>
         </div>
       </div>
     </div>

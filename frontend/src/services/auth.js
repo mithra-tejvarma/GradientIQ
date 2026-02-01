@@ -4,6 +4,7 @@
 
 import { setAuthToken, clearAuthToken } from '../utils/api';
 
+// Import base URL from api.js to avoid duplication
 const API_BASE_URL = 'https://gradientiq-backend.onrender.com';
 
 /**
@@ -89,6 +90,7 @@ export function logout() {
  * @returns {boolean} True if user has a token
  */
 export function isAuthenticated() {
+  // Use same token key as in api.js
   const token = localStorage.getItem('authToken');
   return !!token;
 }

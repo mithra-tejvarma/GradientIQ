@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/auth';
 import './Page.css';
 
@@ -153,18 +153,16 @@ function LoginPage() {
           color: '#666'
         }}>
           Don't have an account?{' '}
-          <a 
-            href="/register" 
+          <Link 
+            to="/register" 
             style={{ 
               color: '#667eea', 
               textDecoration: 'none',
               fontWeight: '600'
             }}
-            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
           >
             Register here
-          </a>
+          </Link>
         </div>
       </div>
     </div>
