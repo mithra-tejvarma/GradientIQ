@@ -365,8 +365,16 @@ def seed_coding_questions_from_json(db: Session) -> Dict:
                 continue
             
             # Create new question
-            cognitive_type_str = q_data.get("cognitive_type", "procedural")
-            cognitive_type = CognitiveType.procedural if cognitive_type_str == "procedural" else CognitiveType.conceptual
+            cognitive_type_str = q_data.get("cognitive_type", "procedural").lower()
+            
+            # Validate and map cognitive type
+            if cognitive_type_str == "procedural":
+                cognitive_type = CognitiveType.procedural
+            elif cognitive_type_str == "conceptual":
+                cognitive_type = CognitiveType.conceptual
+            else:
+                logger.warning(f"Invalid cognitive_type '{cognitive_type_str}', defaulting to procedural")
+                cognitive_type = CognitiveType.procedural
             
             new_question = Question(
                 topic_id=topic.id,
