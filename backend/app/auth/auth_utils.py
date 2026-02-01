@@ -19,7 +19,14 @@ def get_password_hash(password: str) -> str:
     # bcrypt has a 72-byte limit, truncate safely if needed
     password_bytes = password.encode("utf-8")
     if len(password_bytes) > 72:
-        password = password_bytes[:72].decode("utf-8", errors="ignore")
+        # Find a safe UTF-8 boundary at or before 72 bytes
+        # Decode progressively to find the longest valid prefix
+        for i in range(72, 0, -1):
+            try:
+                password = password_bytes[:i].decode("utf-8")
+                break
+            except UnicodeDecodeError:
+                continue
     return pwd_context.hash(password)
 
 
