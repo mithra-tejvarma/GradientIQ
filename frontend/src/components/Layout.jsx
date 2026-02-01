@@ -1,8 +1,15 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { logout } from '../services/auth';
 import './Layout.css';
 
 function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="layout">
@@ -28,6 +35,13 @@ function Layout() {
             >
               Analysis
             </Link>
+            <button 
+              onClick={handleLogout}
+              className="nav-tab logout-button"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </nav>
