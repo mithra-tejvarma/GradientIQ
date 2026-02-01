@@ -13,6 +13,7 @@ import requests
 import logging
 import json
 import os
+import html
 from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
 from app.models.subject import Subject
@@ -106,8 +107,8 @@ def map_trivia_to_question(trivia_item: Dict, subject: Subject, topic: Topic, db
     No external API is called during actual student assessments.
     """
     try:
-        # Extract question text
-        question_text = trivia_item.get("question", "")
+        # Extract question text and decode HTML entities
+        question_text = html.unescape(trivia_item.get("question", ""))
         if not question_text:
             return None
         
@@ -115,9 +116,9 @@ def map_trivia_to_question(trivia_item: Dict, subject: Subject, topic: Topic, db
         trivia_difficulty = trivia_item.get("difficulty", "medium")
         difficulty_level = DIFFICULTY_LEVEL_MAP.get(trivia_difficulty, 6)
         
-        # Get correct and incorrect answers
-        correct_answer = trivia_item.get("correct_answer", "")
-        incorrect_answers = trivia_item.get("incorrect_answers", [])
+        # Get correct and incorrect answers and decode HTML entities
+        correct_answer = html.unescape(trivia_item.get("correct_answer", ""))
+        incorrect_answers = [html.unescape(ans) for ans in trivia_item.get("incorrect_answers", [])]
         
         # Store all options as expected concepts (for multiple choice)
         expected_concepts = {
