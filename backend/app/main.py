@@ -9,6 +9,7 @@ from app.assessment import router as assessment_flow_router
 from app.nlp import nlp_router
 from app.analytics import analytics_router
 from app.utils.health_check import router as health_router
+from app.external import external_router
 
 
 @asynccontextmanager
@@ -49,6 +50,7 @@ app.include_router(capability_router, prefix="/capability", tags=["capability"])
 app.include_router(faculty_router, prefix="/faculty", tags=["faculty"])
 app.include_router(nlp_router, prefix="/nlp", tags=["nlp"])
 app.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
+app.include_router(external_router, prefix="/external", tags=["external"])
 
 # Root endpoint
 @app.get("/")

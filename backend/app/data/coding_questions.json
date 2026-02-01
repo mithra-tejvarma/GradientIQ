@@ -1,0 +1,109 @@
+{
+  "coding_questions": [
+    {
+      "topic": "DSA",
+      "question_text": "Implement a function to reverse a linked list in-place. What is the time and space complexity of your solution?",
+      "difficulty_level": 6,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["linked list", "pointers", "iteration", "time complexity", "space complexity"]
+    },
+    {
+      "topic": "DSA",
+      "question_text": "Write a function to check if a binary tree is balanced. A balanced tree is one where the height difference between left and right subtrees is not more than 1 for any node.",
+      "difficulty_level": 7,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["binary tree", "recursion", "tree height", "balanced tree"]
+    },
+    {
+      "topic": "DSA",
+      "question_text": "Implement a stack using two queues. Explain your design choices and analyze the time complexity of push and pop operations.",
+      "difficulty_level": 8,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["stack", "queue", "data structure design", "time complexity"]
+    },
+    {
+      "topic": "DSA",
+      "question_text": "Given an array of integers, find two numbers such that they add up to a specific target. Return the indices of the two numbers.",
+      "difficulty_level": 4,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["arrays", "hash map", "two pointer", "time complexity"]
+    },
+    {
+      "topic": "DSA",
+      "question_text": "Explain the difference between BFS and DFS graph traversal. When would you use one over the other?",
+      "difficulty_level": 5,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["graph", "BFS", "DFS", "traversal", "use cases"]
+    },
+    {
+      "topic": "Algorithms",
+      "question_text": "Implement the binary search algorithm. What are the prerequisites for using binary search?",
+      "difficulty_level": 4,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["binary search", "sorted array", "divide and conquer", "time complexity"]
+    },
+    {
+      "topic": "Algorithms",
+      "question_text": "Write a function to merge two sorted arrays into one sorted array without using extra space.",
+      "difficulty_level": 7,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["merge", "sorting", "two pointer", "in-place algorithm"]
+    },
+    {
+      "topic": "Algorithms",
+      "question_text": "Explain the difference between dynamic programming and greedy algorithms. Give an example problem for each approach.",
+      "difficulty_level": 6,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["dynamic programming", "greedy", "optimization", "problem solving"]
+    },
+    {
+      "topic": "Algorithms",
+      "question_text": "Implement quicksort algorithm. Explain why it's called a divide-and-conquer algorithm and discuss its average and worst-case time complexity.",
+      "difficulty_level": 8,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["quicksort", "divide and conquer", "pivot", "time complexity", "recursion"]
+    },
+    {
+      "topic": "Algorithms",
+      "question_text": "What is memoization and how does it improve recursive algorithms? Provide an example.",
+      "difficulty_level": 5,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["memoization", "recursion", "optimization", "caching"]
+    },
+    {
+      "topic": "Crypto",
+      "question_text": "Explain the difference between symmetric and asymmetric encryption. Give examples of algorithms for each.",
+      "difficulty_level": 5,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["symmetric encryption", "asymmetric encryption", "AES", "RSA", "cryptography"]
+    },
+    {
+      "topic": "Crypto",
+      "question_text": "What is a hash function and what properties must it have to be cryptographically secure? Give examples of secure hash functions.",
+      "difficulty_level": 6,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["hash function", "collision resistance", "pre-image resistance", "SHA-256", "cryptographic security"]
+    },
+    {
+      "topic": "Crypto",
+      "question_text": "Implement a simple Caesar cipher encryption function. Then explain why Caesar cipher is not secure for modern cryptography.",
+      "difficulty_level": 4,
+      "cognitive_type": "procedural",
+      "expected_concepts": ["Caesar cipher", "encryption", "shift cipher", "cryptanalysis", "security"]
+    },
+    {
+      "topic": "Crypto",
+      "question_text": "Explain how public key infrastructure (PKI) works. What problem does it solve and what are digital certificates?",
+      "difficulty_level": 8,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["PKI", "public key", "private key", "digital certificate", "certificate authority"]
+    },
+    {
+      "topic": "Crypto",
+      "question_text": "What is a salt in password hashing and why is it important? How does it protect against rainbow table attacks?",
+      "difficulty_level": 7,
+      "cognitive_type": "conceptual",
+      "expected_concepts": ["salt", "password hashing", "rainbow table", "security", "bcrypt"]
+    }
+  ]
+}
