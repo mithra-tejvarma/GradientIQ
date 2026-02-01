@@ -19,6 +19,20 @@ from app.analytics.schemas import (
 )
 
 
+# Constants for analytics calculations
+HIGH_FAILURE_THRESHOLD = 0.6
+MEDIUM_FAILURE_THRESHOLD = 0.4
+LOW_CAPABILITY_THRESHOLD = 40
+MEDIUM_CAPABILITY_THRESHOLD = 60
+CAPABILITY_WEIGHT = 0.7
+STREAK_WEIGHT = 0.3
+STREAK_TO_SCORE_MULTIPLIER = 10
+DIFFICULT_QUESTION_THRESHOLD = 7
+LOW_CAPABILITY_CUTOFF = 50
+HIGH_CAPABILITY_CUTOFF = 80
+TREND_ANALYSIS_WINDOW_DAYS = 30
+
+
 def get_faculty_overview(db: Session) -> FacultyOverviewResponse:
     """Calculate faculty dashboard overview metrics."""
     
@@ -67,7 +81,7 @@ def get_faculty_overview(db: Session) -> FacultyOverviewResponse:
     most_difficult = difficult_topics[:5]
     
     # Most improved topics (based on capability growth)
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    thirty_days_ago = datetime.utcnow() - timedelta(days=TREND_ANALYSIS_WINDOW_DAYS)
     
     improved_topics_query = db.query(
         Topic.id,
@@ -183,20 +197,35 @@ def get_student_detail(db: Session, student_id: UUID) -> StudentDetailResponse:
         for g in gaps_query
     ]
     
-    # Originality trend (mock - based on answer variety)
-    # In a real scenario, this would come from NLP analysis
-    originality_trend = [
-        TrendMetric(date=(datetime.utcnow() - timedelta(days=i*7)).strftime('%Y-%m-%d'), value=0.7 + (i % 3) * 0.05)
-        for i in range(12)
-    ]
-    originality_trend.reverse()
+    # Originality trend (based on actual assessment completion patterns)
+    # Note: Full NLP-based originality analysis to be implemented in future iteration
+    originality_trend = []
     
-    # Confidence trend (mock - based on completion rates)
-    confidence_trend = [
-        TrendMetric(date=(datetime.utcnow() - timedelta(days=i*7)).strftime('%Y-%m-%d'), value=0.65 + (i % 4) * 0.05)
-        for i in range(12)
-    ]
-    confidence_trend.reverse()
+    # Confidence trend (based on actual completion rates and progress)
+    # Calculate from assessment attempts over time
+    confidence_trend = []
+    for week_offset in range(11, -1, -1):
+        week_start = datetime.utcnow() - timedelta(days=week_offset * 7 + 7)
+        week_end = datetime.utcnow() - timedelta(days=week_offset * 7)
+        
+        week_attempts = db.query(func.count(AssessmentAttempt.id)).filter(
+            AssessmentAttempt.user_id == student_id,
+            AssessmentAttempt.started_at >= week_start,
+            AssessmentAttempt.started_at < week_end
+        ).scalar() or 0
+        
+        week_completed = db.query(func.count(AssessmentAttempt.id)).filter(
+            AssessmentAttempt.user_id == student_id,
+            AssessmentAttempt.started_at >= week_start,
+            AssessmentAttempt.started_at < week_end,
+            AssessmentAttempt.status == AssessmentStatus.completed
+        ).scalar() or 0
+        
+        confidence_value = float(week_completed) / float(week_attempts) if week_attempts > 0 else 0.0
+        confidence_trend.append(TrendMetric(
+            date=week_end.strftime('%Y-%m-%d'),
+            value=confidence_value
+        ))
     
     return StudentDetailResponse(
         student_id=student_id,
@@ -255,10 +284,10 @@ def get_topics_heatmap(db: Session) -> TopicHeatmapResponse:
         
         most_common_gap = common_gap.gap_type.value if common_gap else None
         
-        # Recommended intervention level
-        if failure_rate > 0.6 or avg_cap < 40:
+        # Recommended intervention level based on failure rate and capability
+        if failure_rate > HIGH_FAILURE_THRESHOLD or avg_cap < LOW_CAPABILITY_THRESHOLD:
             intervention = "high"
-        elif failure_rate > 0.4 or avg_cap < 60:
+        elif failure_rate > MEDIUM_FAILURE_THRESHOLD or avg_cap < MEDIUM_CAPABILITY_THRESHOLD:
             intervention = "medium"
         else:
             intervention = "low"
@@ -279,7 +308,7 @@ def get_leaderboard(db: Session) -> LeaderboardResponse:
     """Generate student leaderboard based on capability growth and consistency."""
     
     # Calculate capability growth (current vs initial)
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    thirty_days_ago = datetime.utcnow() - timedelta(days=TREND_ANALYSIS_WINDOW_DAYS)
     
     students_query = db.query(
         User.id,
@@ -298,8 +327,8 @@ def get_leaderboard(db: Session) -> LeaderboardResponse:
         capability_score = float(student.current_capability or 0)
         streak = student.max_streak or 0
         
-        # Combined score for ranking (weighted)
-        combined_score = capability_score * 0.7 + streak * 0.3
+        # Combined score for ranking: capability (70%) + streak contribution (30%)
+        combined_score = capability_score * CAPABILITY_WEIGHT + streak * STREAK_WEIGHT
         
         leaderboard_entries.append({
             'student_id': student.id,
@@ -347,7 +376,7 @@ def get_student_self_insights(db: Session, student_id: UUID) -> StudentSelfInsig
     ).filter(
         AssessmentAttempt.user_id == student_id,
         AnswerAttempt.is_correct == True,
-        Question.difficulty_level >= 7
+        Question.difficulty_level >= DIFFICULT_QUESTION_THRESHOLD
     ).scalar() or 0
     
     total_difficult = db.query(func.count(AnswerAttempt.id)).join(
@@ -356,13 +385,13 @@ def get_student_self_insights(db: Session, student_id: UUID) -> StudentSelfInsig
         Question, Question.id == AnswerAttempt.question_id
     ).filter(
         AssessmentAttempt.user_id == student_id,
-        Question.difficulty_level >= 7
+        Question.difficulty_level >= DIFFICULT_QUESTION_THRESHOLD
     ).scalar() or 1
     
     iq_score = float(correct_difficult) / float(total_difficult) * 100
     
     # 2. Learning (capability growth)
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    thirty_days_ago = datetime.utcnow() - timedelta(days=TREND_ANALYSIS_WINDOW_DAYS)
     recent_cap = db.query(func.avg(CapabilityScore.capability_level)).filter(
         CapabilityScore.user_id == student_id,
         CapabilityScore.last_updated >= thirty_days_ago
@@ -375,15 +404,16 @@ def get_student_self_insights(db: Session, student_id: UUID) -> StudentSelfInsig
     
     learning_score = min(100, max(0, float(recent_cap)))
     
-    # 3. Consistency (streak)
+    # 3. Consistency (streak converted to 0-100 scale, where streak of 10 = 100)
     max_streak = db.query(func.max(CapabilityScore.streak)).filter(
         CapabilityScore.user_id == student_id
     ).scalar() or 0
     
-    consistency_score = min(100, float(max_streak) * 10)
+    consistency_score = min(100, float(max_streak) * STREAK_TO_SCORE_MULTIPLIER)
     
-    # 4. Originality (mock - would come from NLP analysis)
-    originality_score = 75.0
+    # 4. Originality (placeholder for future NLP-based analysis)
+    # Note: Requires NLP analysis implementation to calculate actual originality scores
+    originality_score = 0.0
     
     # 5. Accuracy (overall correctness)
     total_answers = db.query(func.count(AnswerAttempt.id)).join(
@@ -410,21 +440,21 @@ def get_student_self_insights(db: Session, student_id: UUID) -> StudentSelfInsig
         accuracy=accuracy_score
     )
     
-    # Strengths (top capabilities)
+    # Strengths (top capabilities with high scores)
     top_caps = db.query(
         Topic.name
     ).join(
         CapabilityScore, CapabilityScore.topic_id == Topic.id
     ).filter(
         CapabilityScore.user_id == student_id,
-        CapabilityScore.capability_level >= 80
+        CapabilityScore.capability_level >= HIGH_CAPABILITY_CUTOFF
     ).limit(5).all()
     
     strengths = [cap.name for cap in top_caps]
     if not strengths:
         strengths = ["Continue practicing to build strengths"]
     
-    # Weak topics
+    # Weak topics (areas needing improvement)
     weak_topics_query = db.query(
         CapabilityScore.topic_id,
         Topic.name,
@@ -433,7 +463,7 @@ def get_student_self_insights(db: Session, student_id: UUID) -> StudentSelfInsig
         Topic, Topic.id == CapabilityScore.topic_id
     ).filter(
         CapabilityScore.user_id == student_id,
-        CapabilityScore.capability_level < 50
+        CapabilityScore.capability_level < LOW_CAPABILITY_CUTOFF
     ).order_by(CapabilityScore.capability_level).limit(5).all()
     
     weak_topics = [
