@@ -8,6 +8,7 @@ from app.auth import auth_router
 from app.assessment import router as assessment_flow_router
 from app.nlp import nlp_router
 from app.analytics import analytics_router
+from app.utils.health_check import router as health_router
 
 
 @asynccontextmanager
@@ -36,6 +37,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(health_router, tags=["health"])
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(students_router, prefix="/students", tags=["students"])
 app.include_router(subjects_router, prefix="/subjects", tags=["subjects"])
